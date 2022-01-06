@@ -1,6 +1,7 @@
 package com.poznan.put.michalxpz.graphedu
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -8,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
@@ -17,9 +19,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.poznan.put.michalxpz.graphedu.DrawerMenu.DrawerMenu
 import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphScreen
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
+import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTheme
 import com.poznan.put.michalxpz.graphedu.utils.NullArgumentException
@@ -106,9 +111,18 @@ fun GraphEduNavHost(
                 }
             )
         ) { entry ->
+            val context = LocalContext.current
+            val jsonString = context.resources.openRawResource(R.raw.graphs).bufferedReader().readText()
+            val gson = Gson()
+            val graphsListType = object : TypeToken<List<GraphsItem>>() {}.type
+            val graphs: List<GraphsItem> = gson.fromJson(jsonString, graphsListType)
             val graphId = entry.arguments?.getString("graphId")
-            graphId?.let { GraphScreen(it, navController, { openDrawer() }) } ?: throw NullArgumentException("graphId")
-            GraphScreen(graphId, navController, { openDrawer() });
+
+            val graph = graphs.filter {
+                it.id == graphId?.toInt()
+            }.get(0)
+
+            graphId?.let { GraphScreen(graph, navController, { openDrawer() }) } ?: throw NullArgumentException("graphId")
         }
 
     }

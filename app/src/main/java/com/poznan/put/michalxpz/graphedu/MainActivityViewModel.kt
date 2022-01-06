@@ -2,6 +2,7 @@ package com.poznan.put.michalxpz.graphedu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import hilt_aggregated_deps._dagger_hilt_android_internal_modules_ApplicationContextModule
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
