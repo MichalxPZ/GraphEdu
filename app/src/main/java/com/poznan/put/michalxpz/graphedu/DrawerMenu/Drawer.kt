@@ -26,7 +26,7 @@ fun DrawerMenu(
     ) {
         Image(
             //TODO change icon for graph img
-            painter = painterResource(R.drawable.ic_launcher_background),
+            painter = painterResource(R.drawable.ic_baseline_baby_changing_station_24),
             contentDescription = "App icon"
         )
         entries.forEach { screen ->
