@@ -1,22 +1,29 @@
 package com.poznan.put.michalxpz.graphedu
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import hilt_aggregated_deps._dagger_hilt_android_internal_modules_ApplicationContextModule
+import com.poznan.put.michalxpz.graphedu.MainActivityContract.*
+import com.poznan.put.michalxpz.graphedu.base.BaseViewModel
+import com.poznan.put.michalxpz.graphedu.base.UiEvent
+import com.poznan.put.michalxpz.graphedu.base.UiState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MainActivityViewModel : ViewModel() {
-
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading = _isLoading.asStateFlow()
-
+class MainActivityViewModel : BaseViewModel<Event, State, Effect>() {
     init {
         viewModelScope.launch {
             delay(3000)
-            _isLoading.value = false
+            setState {
+                State(
+                    isLoading = false
+                )
+            }
         }
+    }
+
+    override fun createInitialState(): State {
+        return MainActivityContract.State.empty
+    }
+
+    override fun handleEvent(event: Event) {
     }
 }

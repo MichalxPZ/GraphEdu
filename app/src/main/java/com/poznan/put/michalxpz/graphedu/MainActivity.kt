@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             installSplashScreen().apply {
                 setKeepVisibleCondition{
-                    viewModel.isLoading.value
+                    viewModel.uiState.value.isLoading
                 }
             }
             GraphEduTheme {
