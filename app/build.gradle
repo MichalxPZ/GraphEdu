@@ -86,7 +86,8 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$junit_ext_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
 
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$viewmodel_runtime_ktx_version"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$viewmodel_runtime_ktx_version"
 
     //Coil
@@ -96,6 +97,8 @@ dependencies {
     implementation "androidx.startup:startup-runtime:1.1.0"
 
     implementation "androidx.core:core-splashscreen:1.0.0-alpha02"
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
 
 
 

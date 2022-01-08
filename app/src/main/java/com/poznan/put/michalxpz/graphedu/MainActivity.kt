@@ -1,7 +1,6 @@
 package com.poznan.put.michalxpz.graphedu
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -22,7 +21,7 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.poznan.put.michalxpz.graphedu.DrawerMenu.DrawerMenu
-import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphScreen
+import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragment
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
@@ -45,7 +44,7 @@ class MainActivity : ComponentActivity() {
             }
             GraphEduTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
+                Surface() {
                     GraphEduApp()
                 }
             }
@@ -59,6 +58,13 @@ fun GraphEduApp() {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
     val currentScreen = GraphEduNavigation.fromRoute(backstackEntry.value?.destination?.route)
+
+    val context = LocalContext.current
+    val jsonString = context.resources.openRawResource(R.raw.graphs).bufferedReader().readText()
+    val gson = Gson()
+    val graphsListType = object : TypeToken<List<GraphsItem>>() {}.type
+    val graphs: MutableList<GraphsItem> = gson.fromJson(jsonString, graphsListType)
+
     Surface() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
         val scope = rememberCoroutineScope()
@@ -80,11 +86,15 @@ fun GraphEduApp() {
                             popUpTo(route = route)
                             launchSingleTop = true
                         }
-                    }
+                    },
+                    graphs = graphs,
+                    onButtonClick = {
+                    //TODO implement add graph feature
+                        }
                 )
             }
         ) {
-            GraphEduNavHost(navController = navController, openDrawer = openDrawer )
+            GraphEduNavHost(navController = navController, openDrawer = openDrawer, graphs = graphs)
         }
     }
 }
@@ -93,7 +103,9 @@ fun GraphEduApp() {
 fun GraphEduNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    openDrawer: () -> Job
+    openDrawer: () -> Job,
+    graphs: List<GraphsItem>
+
 ) {
     NavHost(
         navController = navController,
@@ -111,18 +123,14 @@ fun GraphEduNavHost(
                 }
             )
         ) { entry ->
-            val context = LocalContext.current
-            val jsonString = context.resources.openRawResource(R.raw.graphs).bufferedReader().readText()
-            val gson = Gson()
-            val graphsListType = object : TypeToken<List<GraphsItem>>() {}.type
-            val graphs: List<GraphsItem> = gson.fromJson(jsonString, graphsListType)
+
             val graphId = entry.arguments?.getString("graphId")
 
             val graph = graphs.filter {
                 it.id == graphId?.toInt()
             }.get(0)
 
-            graphId?.let { GraphScreen(graph, navController, { openDrawer() }) } ?: throw NullArgumentException("graphId")
+            graphId?.let { GraphFragment(graph, navController, { openDrawer() }, graphs) } ?: throw NullArgumentException("graphId")
         }
 
     }

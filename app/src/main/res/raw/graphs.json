@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": 11,
     "name": "my_first_graph",
     "graph": {
       "num_of_vertices": 5,
@@ -8,32 +8,184 @@
         {
           "vertex_id": 1,
           "color": "RED",
-          "x_pos": 200,
-          "y_pos": -200
+          "x_pos": 500,
+          "y_pos": 500
         },
         {
           "vertex_id": 2,
           "color": "BLUE",
-          "x_pos": -100,
+          "x_pos": 600,
+          "y_pos": 600
+        },
+        {
+          "vertex_id": 3,
+          "color": "RED",
+          "x_pos": 700,
+          "y_pos": 300
+        },
+        {
+          "vertex_id": 4,
+          "color": "GREEN",
+          "x_pos": 100,
+          "y_pos": 2000
+        },
+        {
+          "vertex_id": 5,
+          "color": "RED",
+          "x_pos": 200,
+          "y_pos": 500
+        }
+      ],
+      "num_of_edges": 5,
+      "edges": [
+        {
+          "start": 1,
+          "end": 2
+        },
+        {
+          "start": 2,
+          "end": 3
+        },
+        {
+          "start": 3,
+          "end": 5
+        },
+        {
+          "start": 5,
+          "end": 2
+        },
+        {
+          "start": 1,
+          "end": 3
+        }
+      ]
+    }
+  },
+  {
+    "id": 21,
+    "name": "EDUGRAPH",
+    "graph": {
+      "num_of_vertices": 3,
+      "vertices": [
+        {
+          "vertex_id": 3,
+          "color": "RED",
+          "x_pos": 300,
+          "y_pos": 630
+        },
+        {
+          "vertex_id": 4,
+          "color": "GREEN",
+          "x_pos": 460,
+          "y_pos": 620
+        },
+        {
+          "vertex_id": 5,
+          "color": "RED",
+          "x_pos": 520,
           "y_pos": 100
+        }
+      ],
+      "num_of_edges": 2,
+      "edges": [
+        {
+          "start": 3,
+          "end": 4
+        },
+        {
+          "start": 3,
+          "end": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": 31,
+    "name": "Sc",
+    "graph": {
+      "num_of_vertices": 6,
+      "vertices": [
+        {
+          "vertex_id": 1,
+          "color": "RED",
+          "x_pos": 700,
+          "y_pos": 300
+        },
+        {
+          "vertex_id": 2,
+          "color": "BLUE",
+          "x_pos": 10,
+          "y_pos": 10
         },
         {
           "vertex_id": 3,
           "color": "RED",
           "x_pos": 300,
-          "y_pos": -300
+          "y_pos": 300
         },
         {
           "vertex_id": 4,
           "color": "GREEN",
-          "x_pos": -200,
-          "y_pos": -400
+          "x_pos": 600,
+          "y_pos": 200
         },
         {
           "vertex_id": 5,
           "color": "RED",
-          "x_pos": -200,
-          "y_pos": -500
+          "x_pos": 720,
+          "y_pos": 220
+        },
+        {
+          "vertex_id": 6,
+          "color": "RED",
+          "x_pos": 130,
+          "y_pos": 820
+        }
+      ],
+      "num_of_edges": 1,
+      "edges": [
+        {
+          "start": 1,
+          "end": 6
+        }
+      ]
+    }
+  },
+  {
+    "id": 41,
+    "name": "Try",
+    "graph": {
+      "num_of_vertices": 5,
+      "vertices": [
+        {
+          "vertex_id": 1,
+          "color": "RED",
+          "x_pos": 620,
+          "y_pos": 420
+        },
+        {
+          "vertex_id": 2,
+          "color": "BLUE",
+          "x_pos": 500,
+          "y_pos": 600
+        },
+        {
+          "vertex_id": 3,
+          "color": "RED",
+          "x_pos": 200,
+          "y_pos": 700
+        },
+        {
+          "vertex_id": 4,
+          "color": "GREEN",
+          "x_pos": 340,
+          "y_pos": 600
+        },
+        {
+          "vertex_id": 5,
+          "color": "RED",
+          "x_pos": 1200,
+          "y_pos": 220
         }
       ],
       "num_of_edges": 5,
@@ -62,6 +214,68 @@
     }
   },
   {
+    "id": 1,
+    "name": "my_first_graph",
+    "graph": {
+      "num_of_vertices": 5,
+      "vertices": [
+        {
+          "vertex_id": 1,
+          "color": "RED",
+          "x_pos": 500,
+          "y_pos": 500
+        },
+        {
+          "vertex_id": 2,
+          "color": "BLUE",
+          "x_pos": 600,
+          "y_pos": 600
+        },
+        {
+          "vertex_id": 3,
+          "color": "RED",
+          "x_pos": 700,
+          "y_pos": 300
+        },
+        {
+          "vertex_id": 4,
+          "color": "GREEN",
+          "x_pos": 100,
+          "y_pos": 2000
+        },
+        {
+          "vertex_id": 5,
+          "color": "RED",
+          "x_pos": 200,
+          "y_pos": 500
+        }
+      ],
+      "num_of_edges": 5,
+      "edges": [
+        {
+          "start": 1,
+          "end": 2
+        },
+        {
+          "start": 2,
+          "end": 3
+        },
+        {
+          "start": 3,
+          "end": 5
+        },
+        {
+          "start": 5,
+          "end": 2
+        },
+        {
+          "start": 1,
+          "end": 3
+        }
+      ]
+    }
+  },
+  {
     "id": 2,
     "name": "EDUGRAPH",
     "graph": {
@@ -71,19 +285,19 @@
           "vertex_id": 3,
           "color": "RED",
           "x_pos": 300,
-          "y_pos": -30
+          "y_pos": 630
         },
         {
           "vertex_id": 4,
           "color": "GREEN",
-          "x_pos": -60,
+          "x_pos": 460,
           "y_pos": 620
         },
         {
           "vertex_id": 5,
           "color": "RED",
-          "x_pos": -220,
-          "y_pos": 400
+          "x_pos": 520,
+          "y_pos": 100
         }
       ],
       "num_of_edges": 2,
@@ -108,38 +322,38 @@
         {
           "vertex_id": 1,
           "color": "RED",
-          "x_pos": 200,
-          "y_pos": 200
+          "x_pos": 700,
+          "y_pos": 300
         },
         {
           "vertex_id": 2,
           "color": "BLUE",
-          "x_pos": -10,
-          "y_pos": -10
+          "x_pos": 10,
+          "y_pos": 10
         },
         {
           "vertex_id": 3,
           "color": "RED",
-          "x_pos": -300,
+          "x_pos": 300,
           "y_pos": 300
         },
         {
           "vertex_id": 4,
           "color": "GREEN",
           "x_pos": 600,
-          "y_pos": -200
+          "y_pos": 200
         },
         {
           "vertex_id": 5,
           "color": "RED",
-          "x_pos": -20,
-          "y_pos": -20
+          "x_pos": 720,
+          "y_pos": 220
         },
         {
           "vertex_id": 6,
           "color": "RED",
-          "x_pos": -30,
-          "y_pos": -20
+          "x_pos": 130,
+          "y_pos": 820
         }
       ],
       "num_of_edges": 1,
@@ -160,32 +374,32 @@
         {
           "vertex_id": 1,
           "color": "RED",
-          "x_pos": 20,
-          "y_pos": 20
+          "x_pos": 620,
+          "y_pos": 420
         },
         {
           "vertex_id": 2,
           "color": "BLUE",
-          "x_pos": 100,
-          "y_pos": 100
+          "x_pos": 500,
+          "y_pos": 600
         },
         {
           "vertex_id": 3,
           "color": "RED",
-          "x_pos": 300,
-          "y_pos": 300
+          "x_pos": 200,
+          "y_pos": 700
         },
         {
           "vertex_id": 4,
           "color": "GREEN",
-          "x_pos": 60,
+          "x_pos": 340,
           "y_pos": 600
         },
         {
           "vertex_id": 5,
           "color": "RED",
-          "x_pos": -200,
-          "y_pos": -20
+          "x_pos": 1200,
+          "y_pos": 220
         }
       ],
       "num_of_edges": 5,
