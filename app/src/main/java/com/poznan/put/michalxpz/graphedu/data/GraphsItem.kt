@@ -1,9 +1,6 @@
 package com.poznan.put.michalxpz.graphedu.data
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
+import androidx.room.*
 import com.poznan.put.michalxpz.graphedu.converters.GraphTypeConverter
 
 @Entity(tableName = "graphsitem")
@@ -14,7 +11,6 @@ data class GraphsItem(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "graph")
+    @Embedded
     val graph: Graph
-
 )

@@ -40,9 +40,10 @@ fun GraphScreen(
     }
 
     val _mapOfVertices = mutableMapOf<Int, Pair<Int, Int>>()
-    graph.graph.vertices.forEach { vert ->
-        _mapOfVertices.put(vert.vertex_id, Pair(vert.x_pos, vert.y_pos))
-    }
+    //TODO
+//    graph.graph.vertices.forEach { vert ->
+//        _mapOfVertices.put(vert.vertex_id, Pair(vert.x_pos, vert.y_pos))
+//    }
     val mapOfVertices by remember { mutableStateOf(_mapOfVertices) }
     var selectedVert: Int? by remember { mutableStateOf(null) }
 
@@ -129,40 +130,39 @@ fun GraphScreen(
                     radius = size.minDimension / 32
                 )
             }
+//TODO
+//            graph.graph.edges.forEach {
+//                val startVertex = it.start
+//                val endVertex = it.end
 
-            graph.graph.edges.forEach {
-                val startVertex = it.start
-                val endVertex = it.end
-
-                mapOfVertices.forEach { (idStart, start) ->
-                    mapOfVertices.forEach { (idEnd, end) ->
-                        if (idStart == startVertex && idEnd == endVertex) {
-                            drawLine(
-                                start = Offset(
-                                    x = start.first.toFloat(),
-                                    y = start.second.toFloat()
-                                ),
-                                end = Offset(x = end.first.toFloat(), y = end.second.toFloat()),
-                                color = Color.Blue,
-                                strokeWidth = 5F
-                            )
-                        }
-                    }
-                }
+//                mapOfVertices.forEach { (idStart, start) ->
+//                    mapOfVertices.forEach { (idEnd, end) ->
+//                        if (idStart == startVertex && idEnd == endVertex) {
+//                            drawLine(
+//                                start = Offset(
+//                                    x = start.first.toFloat(),
+//                                    y = start.second.toFloat()
+//                                ),
+//                                end = Offset(x = end.first.toFloat(), y = end.second.toFloat()),
+//                                color = Color.Blue,
+//                                strokeWidth = 5F
+//                            )
+//                        }
+//                    }
+//                }
             }
         }
     }
-}
 
 
-@Preview(name = "graphFragment")
-@Composable
-fun GraphFragmentPreview() {
-    GraphScreen(
-//        state = GraphFragmentContract.State.empty,
-        title = "Graph Fragment",
-        onBackArrowClicked = { },
-        graph = GraphsItem(1, "Graph Fragment", Graph(listOf(), 0, 0, listOf()))
-
-    )
-}
+//@Preview(name = "graphFragment")
+//@Composable
+//fun GraphFragmentPreview() {
+//    GraphScreen(
+////        state = GraphFragmentContract.State.empty,
+//        title = "Graph Fragment",
+//        onBackArrowClicked = { },
+//        graph = GraphsItem(1, "Graph Fragment", Graph(listOf(), 0, 0, listOf()))
+//
+//    )
+//}

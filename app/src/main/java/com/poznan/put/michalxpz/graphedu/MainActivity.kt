@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -41,11 +42,14 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val graphDao by lazy {
+        GraphsDatabase.getDataBase(this).graphDao
+    }
+    private val viewModel: MainActivityViewModel by lazy {MainActivityViewModel(dao = graphDao)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val graphDao = GraphsDatabase.getDataBase(this).graphDao
+
         setContent {
             installSplashScreen().apply {
                 setKeepVisibleCondition{
@@ -75,14 +79,14 @@ fun GraphEduApp() {
     val graphsListType = object : TypeToken<List<GraphsItem>>() {}.type
     val graphs: MutableList<GraphsItem> = gson.fromJson(jsonString, graphsListType)
 
-    graphs.add(GraphsItem(
-        id = 1, name = "name",
-        graph = Graph(
-            edges = listOf(Edge(2, 1)),
-            num_of_edges = 1,
-            num_of_vertices = 2,
-            vertices = listOf(Vertice("RED", 1, 500, 500), Vertice("RED", 2, 700, 700))
-        )))
+//    graphs.add(GraphsItem(
+//        id = 1, name = "name",
+//        graph = Graph(
+//            edges = listOf(Edge(2, 1)),
+//            num_of_edges = 1,
+//            num_of_vertices = 2,
+//            vertices = listOf(Vertice("RED", 1, 500, 500), Vertice("RED", 2, 700, 700))
+//        )))
 
     Surface() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)

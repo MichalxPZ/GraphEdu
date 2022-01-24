@@ -171,9 +171,9 @@ private fun GraphEntry(
         )
     )
 }
-
-@Preview(name = "graph entry")
-@Composable
-private fun PreviewGraphEntry() {
-    GraphEntry(graph = GraphsItem(1, "name", Graph(listOf(), 0, 0, listOf())), onDestinationClicked = {}, removeGraph = {})
-}
+//
+//@Preview(name = "graph entry")
+//@Composable
+//private fun PreviewGraphEntry() {
+//    GraphEntry(graph = GraphsItem(1, "name", Graph(listOf(), 0, 0, listOf())), onDestinationClicked = {}, removeGraph = {})
+//}

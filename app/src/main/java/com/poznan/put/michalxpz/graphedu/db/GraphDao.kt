@@ -22,7 +22,7 @@ interface GraphDao {
     fun findById(id: Int,): GraphsItem
 
     @Insert
-    fun insertAll(vararg graph: GraphsItem)
+    suspend fun insertAll(vararg graph: GraphsItem)
 
     @Delete
     fun delete(graph: GraphsItem)

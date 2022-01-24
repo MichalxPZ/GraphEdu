@@ -1,12 +1,15 @@
 package com.poznan.put.michalxpz.graphedu.db
 
 import android.content.Context
-import androidx.room.*
-import com.poznan.put.michalxpz.graphedu.converters.GraphTypeConverter
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.poznan.put.michalxpz.graphedu.data.Edge
+import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
+import com.poznan.put.michalxpz.graphedu.data.Vertice
 
-@Database(entities = [GraphsItem::class], version = 1)
-@TypeConverters(GraphTypeConverter::class)
+@Database(entities = [GraphsItem::class, Graph::class, Edge::class, Vertice::class], version = 1, exportSchema = false)
 abstract class GraphsDatabase : RoomDatabase() {
     abstract val graphDao: GraphDao
 
@@ -20,8 +23,7 @@ abstract class GraphsDatabase : RoomDatabase() {
                     context.applicationContext,
                     GraphsDatabase::class.java,
                     "graphs_db"
-                ).addTypeConverter(GraphTypeConverter())
-                    .fallbackToDestructiveMigration()
+                ).fallbackToDestructiveMigration()
                     .build().also {
                     INSTANCE = it
                 }
