@@ -18,16 +18,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
 import com.poznan.put.michalxpz.graphedu.DrawerMenu.DrawerMenu
 import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragment
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
+import com.poznan.put.michalxpz.graphedu.data.Edge
+import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
+import com.poznan.put.michalxpz.graphedu.data.Vertice
+import com.poznan.put.michalxpz.graphedu.db.GraphDao
+import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
+import com.poznan.put.michalxpz.graphedu.repository.GraphRepository
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTheme
 import com.poznan.put.michalxpz.graphedu.utils.NullArgumentException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -36,6 +45,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val graphDao = GraphsDatabase.getDataBase(this).graphDao
         setContent {
             installSplashScreen().apply {
                 setKeepVisibleCondition{
@@ -64,6 +74,15 @@ fun GraphEduApp() {
     val gson = Gson()
     val graphsListType = object : TypeToken<List<GraphsItem>>() {}.type
     val graphs: MutableList<GraphsItem> = gson.fromJson(jsonString, graphsListType)
+
+    graphs.add(GraphsItem(
+        id = 1, name = "name",
+        graph = Graph(
+            edges = listOf(Edge(2, 1)),
+            num_of_edges = 1,
+            num_of_vertices = 2,
+            vertices = listOf(Vertice("RED", 1, 500, 500), Vertice("RED", 2, 700, 700))
+        )))
 
     Surface() {
         val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -133,13 +152,5 @@ fun GraphEduNavHost(
             graphId?.let { GraphFragment(graph, navController, { openDrawer() }, graphs) } ?: throw NullArgumentException("graphId")
         }
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    GraphEduTheme {
-        GraphEduApp()
     }
 }

@@ -175,5 +175,5 @@ private fun GraphEntry(
 @Preview(name = "graph entry")
 @Composable
 private fun PreviewGraphEntry() {
-    GraphEntry(graph = GraphsItem(Graph(listOf(), 0, 0, listOf()), 1, "Graph"), onDestinationClicked = {}, removeGraph = {})
+    GraphEntry(graph = GraphsItem(1, "name", Graph(listOf(), 0, 0, listOf())), onDestinationClicked = {}, removeGraph = {})
 }

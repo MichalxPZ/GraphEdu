@@ -162,7 +162,7 @@ fun GraphFragmentPreview() {
 //        state = GraphFragmentContract.State.empty,
         title = "Graph Fragment",
         onBackArrowClicked = { },
-        graph = GraphsItem(Graph(listOf(), 0, 0, listOf()), 1, "Graph Fragment")
+        graph = GraphsItem(1, "Graph Fragment", Graph(listOf(), 0, 0, listOf()))
 
     )
 }
