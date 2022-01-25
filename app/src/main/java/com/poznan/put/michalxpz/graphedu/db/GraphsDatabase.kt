@@ -24,6 +24,7 @@ abstract class GraphsDatabase : RoomDatabase() {
                     GraphsDatabase::class.java,
                     "graphs_db"
                 ).fallbackToDestructiveMigration()
+                    .allowMainThreadQueries()
                     .build().also {
                     INSTANCE = it
                 }

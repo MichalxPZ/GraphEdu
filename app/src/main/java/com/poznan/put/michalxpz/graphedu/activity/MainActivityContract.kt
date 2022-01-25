@@ -1,8 +1,9 @@
-package com.poznan.put.michalxpz.graphedu
+package com.poznan.put.michalxpz.graphedu.activity
 
 import com.poznan.put.michalxpz.graphedu.base.UiEffect
 import com.poznan.put.michalxpz.graphedu.base.UiEvent
 import com.poznan.put.michalxpz.graphedu.base.UiState
+import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 
 
 interface MainActivityContract {
@@ -14,10 +15,11 @@ interface MainActivityContract {
     }
 
     data class State(
-        var isLoading: Boolean
+        var isLoading: Boolean,
+        val graphsItems: ArrayList<GraphsItem>
     ) : UiState {
         companion object {
-            val empty = State(true)
+            val empty = State(true, ArrayList())
         }
     }
 }

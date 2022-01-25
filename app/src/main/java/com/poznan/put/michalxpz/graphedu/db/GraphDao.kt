@@ -1,29 +1,66 @@
 package com.poznan.put.michalxpz.graphedu.db
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
+import com.poznan.put.michalxpz.graphedu.data.Edge
+import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
+import com.poznan.put.michalxpz.graphedu.data.Vertice
 
 @Dao
 interface GraphDao {
 
+    @Transaction
     @Query("SELECT * FROM graphsitem")
-    fun getAll(): List<GraphsItem>
+    suspend fun getAllGraphItems(): List<GraphsItem>
 
+    @Transaction
+    @Query("SELECT * FROM graphs")
+    suspend fun getAllGraphs(): List<Graph>
+
+    @Transaction
     @Query("SELECT * FROM graphsitem WHERE id IN (:graphIds)")
-    fun loadAllByIds(graphIds: IntArray): List<GraphsItem>
+    suspend fun loadAllGraphItemsByIds(graphIds: IntArray): List<GraphsItem>
 
+    @Transaction
+    @Query("SELECT * FROM graphs WHERE graphId IN (:graphIds)")
+    suspend fun loadAllGraphsByIds(graphIds: IntArray): List<Graph>
+
+    @Transaction
     @Query("SELECT * FROM graphsitem WHERE name LIKE :name")
-    fun findByName(name: String,): GraphsItem
+    suspend fun findByName(name: String,): GraphsItem
 
+    @Transaction
     @Query("SELECT * FROM graphsitem WHERE id LIKE :id")
-    fun findById(id: Int,): GraphsItem
+    suspend fun findGraphItemById(id: Int,): GraphsItem
+    @Transaction
+    @Query("SELECT * FROM graphs WHERE graphId LIKE :id")
+    suspend fun findGraphById(id: Int,): Graph
 
+    @Transaction
     @Insert
-    suspend fun insertAll(vararg graph: GraphsItem)
+    suspend fun insertAllGraphItems(vararg graph: GraphsItem)
 
+    @Transaction
+    @Insert
+    suspend fun insertAllGraphs(vararg graph: Graph)
+
+    @Transaction
+    @Insert
+    suspend fun insertEdge(vararg edge: Edge)
+
+    @Transaction
+    @Insert
+    suspend fun insertVertice(vararg vertice: Vertice)
+
+    @Transaction
     @Delete
-    fun delete(graph: GraphsItem)
+    suspend fun delete(graph: GraphsItem)
+
+    @Transaction
+    @Delete
+    suspend fun deleteEdge(edge: Edge)
+
+    @Transaction
+    @Delete
+    suspend fun deleteVertice(vertice: Vertice)
 }

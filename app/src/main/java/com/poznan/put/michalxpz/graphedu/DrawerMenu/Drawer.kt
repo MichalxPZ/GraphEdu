@@ -20,6 +20,7 @@ import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTypography
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun DrawerMenu(
