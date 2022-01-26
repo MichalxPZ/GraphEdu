@@ -3,7 +3,6 @@ package com.poznan.put.michalxpz.graphedu.MainScreen
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.poznan.put.michalxpz.graphedu.DrawerMenu.TopBar
