@@ -6,7 +6,7 @@ import androidx.room.*
 data class GraphsItem(
 
     @ColumnInfo(name = "name")
-    val name: String,
+    val name: String
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
