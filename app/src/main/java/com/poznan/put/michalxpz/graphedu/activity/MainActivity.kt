@@ -1,6 +1,7 @@
 package com.poznan.put.michalxpz.graphedu.activity
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.poznan.put.michalxpz.graphedu.DrawerMenu.DrawerMenu
 import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragment
+import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragmentViewModel
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.dialogs.AddGraphDialog
@@ -30,79 +33,108 @@ import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTheme
 import com.poznan.put.michalxpz.graphedu.utils.NullArgumentException
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
+    private var message: String = ""
+    private var graphs = mutableListOf<GraphsItem>()
+    private var editMessage: String = ""
+    private var drawerState = DrawerState(DrawerValue.Closed)
+    private var openDialog = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
+            initObservers()
             installSplashScreen().apply {
-                setKeepVisibleCondition{
+                setKeepVisibleCondition {
                     viewModel.uiState.value.isLoading
                 }
             }
+
             GraphEduTheme {
                 Surface() {
-                    GraphEduApp(viewModel = viewModel)
+                    GraphEduApp(viewModel.uiState.collectAsState().value, viewModel)
                 }
             }
         }
     }
+
+    private fun initObservers() {
+        lifecycleScope.launchWhenStarted {
+            viewModel.uiState.collect {
+                message = viewModel.uiState.value.message
+                graphs = viewModel.uiState.value.graphsItems
+                openDialog = viewModel.uiState.value.openDialog
+                editMessage = viewModel.uiState.value.editText
+                drawerState = viewModel.uiState.value.drawerState
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.effect.collect {
+                when(it) {
+                    is MainActivityContract.Effect.CloseDialog -> {
+                        openDialog = false
+                    }
+
+                    is MainActivityContract.Effect.EditText -> {
+                        message = editMessage
+                    }
+
+                    is MainActivityContract.Effect.FetchingError -> {
+                        showToast("Error occurred")
+                    }
+                    is MainActivityContract.Effect.OpenDialog -> {
+                    }
+                    is MainActivityContract.Effect.OpenDrawer -> {
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
+    }
 }
 
 @Composable
-fun GraphEduApp(viewModel: MainActivityViewModel) {
+fun GraphEduApp(
+    state: MainActivityContract.State,
+    viewModel: MainActivityViewModel
+) {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
 
     Surface() {
-        val message = remember { mutableStateOf("Edit Me") }
-        val graphs = remember {
-            mutableStateOf(viewModel.currentState.graphsItems)
-        }
 
-        val openDialog = remember { mutableStateOf(false) }
-        val editMessage = remember { mutableStateOf("") }
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
-        val scope = rememberCoroutineScope()
-        val openDrawer = {
-            scope.launch {
-                drawerState.open()
-            }
-        }
         ModalDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = drawerState.isOpen,
+            drawerState = state.drawerState,
+            gesturesEnabled = state.drawerState.isOpen,
             drawerContent = {
                 DrawerMenu(
                     onDestinationClicked = { route ->
-                        scope.launch {
-                            drawerState.close()
-                        }
+                        viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked)
                         navController.navigate(route) {
                             popUpTo(route = route)
                             launchSingleTop = true
                         }
                     },
-                    graphs = graphs.value,
+                    graphs = state.graphsItems,
                     onButtonClick = {
-                        scope.launch {
-                            drawerState.close()
-                        }
-                        editMessage.value = message.value
-                        openDialog.value = true
-                    }
+                        viewModel.setEvent(MainActivityContract.Event.OnCreateButtonClicked)
+                    },
+                    viewModel = viewModel
                 )
             }
         ) {
-            GraphEduNavHost(navController = navController, openDrawer = openDrawer, graphs = graphs.value)
-            if (openDialog.value) {
+            GraphEduNavHost(navController = navController, openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) }, graphs = state.graphsItems)
+            if (state.openDialog) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -114,12 +146,12 @@ fun GraphEduApp(viewModel: MainActivityViewModel) {
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {
-                                openDialog.value = false
+                                viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked)
                             }
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    AddGraphDialog(message, openDialog, editMessage, viewModel)
+                    AddGraphDialog(mutableStateOf(state.message), mutableStateOf(state.editText), state.openDialog, viewModel)
                 }
             }
         }
@@ -130,7 +162,7 @@ fun GraphEduApp(viewModel: MainActivityViewModel) {
 fun GraphEduNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    openDrawer: () -> Job,
+    openDrawer: () -> Unit,
     graphs: List<GraphsItem>
 
 ) {
@@ -140,7 +172,7 @@ fun GraphEduNavHost(
         modifier = modifier
     ) {
         composable(GraphEduNavigation.MainScreen.name) {
-            MainScreen(navController = navController, openDrawer = { openDrawer() })
+            MainScreen(navController = navController) { openDrawer() }
         }
         composable(
             route = "${GraphEduNavigation.GraphScreen.name}/{graphId}",
@@ -157,7 +189,7 @@ fun GraphEduNavHost(
                 it.id == graphId?.toInt()
             }.get(0)
 
-            graphId?.let { GraphFragment(graph, navController, { openDrawer() }, graphs) } ?: throw NullArgumentException("graphId")
+            graphId?.let { GraphFragment(graph, navController) } ?: throw NullArgumentException("graphId")
         }
 
     }

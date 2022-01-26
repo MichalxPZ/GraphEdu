@@ -1,7 +1,10 @@
 package com.poznan.put.michalxpz.graphedu.hilt
 
 import android.content.Context
+import androidx.navigation.NavController
 import androidx.room.Room
+import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragmentViewModel
+import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import dagger.Module
 import dagger.Provides

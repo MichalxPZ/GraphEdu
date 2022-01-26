@@ -6,7 +6,10 @@ import androidx.room.*
 data class GraphsItem(
 
     @ColumnInfo(name = "name")
-    val name: String
+    val name: String,
+
+    @ColumnInfo(name = "graphJson")
+    val graphJson: String
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

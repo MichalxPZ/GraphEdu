@@ -9,7 +9,7 @@ import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.data.Vertice
 
-@Database(entities = [GraphsItem::class, Graph::class, Edge::class, Vertice::class], version = 1, exportSchema = false)
+@Database(entities = [GraphsItem::class], version = 1, exportSchema = false)
 abstract class GraphsDatabase : RoomDatabase() {
     abstract val graphDao: GraphDao
 

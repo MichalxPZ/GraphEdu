@@ -10,17 +10,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityViewModel
-import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 
 
 @Composable
 fun AddGraphDialog(
     message: MutableState<String>,
-    openDialog: MutableState<Boolean>,
-    editMessage: MutableState<String>,
+    editText: MutableState<String>,
+    openDialog: Boolean,
     viewModel: MainActivityViewModel
-) { Column(
+) {
+
+    Column(
         modifier = Modifier
             .clip(RoundedCornerShape(4.dp))
             .background(MaterialTheme.colors.background)
@@ -34,8 +36,11 @@ fun AddGraphDialog(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextField(
-                value = editMessage.value,
-                onValueChange = { editMessage.value = it },
+                value = editText.value,
+                onValueChange = {
+                    viewModel.setEvent(MainActivityContract.Event.OnDialogTextEdit)
+                    viewModel.uiState.value.editText = it
+                    editText.value = it },
                 singleLine = true
             )
         }
@@ -47,7 +52,7 @@ fun AddGraphDialog(
         ) {
             Button(
                 onClick = {
-                    openDialog.value = false
+                    viewModel.setEvent(MainActivityContract.Event.OnCloseDialogClicked)
                 }
             ) {
                 Text("Cancel")
@@ -57,9 +62,9 @@ fun AddGraphDialog(
 
             Button(
                 onClick = {
-                    viewModel.addGraph(editMessage.value)
-                    message.value = editMessage.value
-                    openDialog.value = false
+                    viewModel.setEvent(MainActivityContract.Event.OnDialogTextEdit)
+                    viewModel.setEvent(MainActivityContract.Event.OnOkDialogClicked)
+                    viewModel.setEvent(MainActivityContract.Event.OnCloseDialogClicked)
                 }
             ) {
                 Text("OK")

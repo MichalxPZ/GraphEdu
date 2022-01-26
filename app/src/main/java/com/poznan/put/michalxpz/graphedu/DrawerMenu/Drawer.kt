@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.poznan.put.michalxpz.graphedu.R
+import com.poznan.put.michalxpz.graphedu.activity.MainActivityViewModel
 import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
@@ -27,10 +28,11 @@ fun DrawerMenu(
     modifier: Modifier = Modifier,
     onDestinationClicked: (route: String) -> Unit,
     graphs: MutableList<GraphsItem>,
-    onButtonClick: () -> Unit
+    onButtonClick: () -> Unit,
+    viewModel: MainActivityViewModel
 ) {
     Column() {
-        Entries(onDestinationClicked, graphs)
+        Entries(onDestinationClicked, graphs, viewModel)
         Spacer(modifier = Modifier.height(24.dp))
         AddGraph(onClick = { onButtonClick() })
     }
@@ -52,9 +54,9 @@ fun AddGraph(onClick : () -> Unit) {
 @Composable
 fun Entries(
     onDestinationClicked: (route: String) -> Unit,
-    graphs: MutableList<GraphsItem>
+    graphs: MutableList<GraphsItem>,
+    viewmodel: MainActivityViewModel
 ) {
-    val graphList by remember { mutableStateOf(graphs) }
 
     Column(Modifier.height(500.dp)) {
         Image(
@@ -82,7 +84,7 @@ fun Entries(
                 .padding(start = 24.dp)
         ) {
             item {
-                GraphEntriesColumn(graphList, onDestinationClicked)
+                GraphEntriesColumn(graphs, onDestinationClicked, viewmodel)
             }
         }
     }
@@ -91,7 +93,8 @@ fun Entries(
 @Composable
 private fun GraphEntriesColumn(
     graphList: MutableList<GraphsItem>,
-    onDestinationClicked: (route: String) -> Unit
+    onDestinationClicked: (route: String) -> Unit,
+    viewmodel: MainActivityViewModel
 ) {
     graphList.forEach { graph ->
         var deleted by remember { mutableStateOf(false) }
@@ -102,6 +105,8 @@ private fun GraphEntriesColumn(
                     onDestinationClicked = onDestinationClicked,
                     removeGraph = {
                         graphList.remove(graph)
+                        deleted = !deleted
+                        viewmodel.deleteGraph(graph)
                         deleted = !deleted
                     }
                 )
@@ -154,7 +159,6 @@ private fun GraphEntry(
     onDestinationClicked: (route: String) -> Unit,
     removeGraph: () -> Unit
 ) {
-
     Text(
         text = graph.name,
         style = GraphEduTypography.h4,
