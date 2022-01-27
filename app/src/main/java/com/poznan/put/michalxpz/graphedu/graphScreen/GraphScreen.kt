@@ -17,8 +17,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.poznan.put.michalxpz.graphedu.R
 import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
@@ -26,6 +30,9 @@ import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFabItem
 import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFabState
 import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFloatingActionButton
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 @Composable
@@ -39,7 +46,57 @@ fun GraphScreen(
     onDeleteVertice: () -> Unit,
     onDeleteEdge: () -> Unit,
     viewModel: GraphFragmentViewModel,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
 ) {
+    val scope = rememberCoroutineScope()
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                scope.launch {
+                    viewModel.uiState.collect {
+                        state.graph = viewModel.uiState.value.graph
+                        state.id = viewModel.uiState.value.id
+                        state.name = viewModel.uiState.value.name
+                        state.mode = viewModel.uiState.value.mode
+                    }
+
+                    viewModel.effect.collect {
+                        when (it) {
+                            is GraphFragmentContract.Effect.CanvasClick -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                            is GraphFragmentContract.Effect.AddEdge -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                            is GraphFragmentContract.Effect.AddNode -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                            is GraphFragmentContract.Effect.FetchingError -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                            is GraphFragmentContract.Effect.NavigateBack -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+
+                            }
+                            is GraphFragmentContract.Effect.NodeDrag -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                            is GraphFragmentContract.Effect.DeleteEdge -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                            is GraphFragmentContract.Effect.DeleteNode -> {
+                                println("MODE: ${viewModel.uiState.value.mode}")
+                            }
+                        }
+                    }
+                }
+            }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
 
     var scale by remember { mutableStateOf(1f) }
     var rotation by remember { mutableStateOf(0f) }
@@ -72,7 +129,7 @@ fun GraphScreen(
 
     Scaffold(
         floatingActionButton = {
-            MultiFloatingActionButton(items = items, toState = toState, stateChanged = {state -> toState = state})
+            MultiFloatingActionButton(items = items, toState = toState, stateChanged = {state -> toState = state}, fabIcon = addImage, showLabels = true, onFabItemClicked = {})
         }
     ) {
 

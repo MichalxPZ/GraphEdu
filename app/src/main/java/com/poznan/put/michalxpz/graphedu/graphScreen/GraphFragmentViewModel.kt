@@ -9,6 +9,7 @@ import com.poznan.put.michalxpz.graphedu.data.Edge
 import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.Vertice
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -45,54 +46,60 @@ class GraphFragmentViewModel (private val database: GraphsDatabase, private val 
         }
     }
 
-    fun onCanvasClick() {
+    private fun onCanvasClick() {
         viewModelScope.launch {
             setEffect { Effect.CanvasClick }
+            println("MODE: ${uiState.value.mode}")
         }
     }
 
-    fun onNodeDrag() {
+    private fun onNodeDrag() {
         viewModelScope.launch {
             setEffect { Effect.NodeDrag }
+            println("MODE: ${uiState.value.mode}")
         }
     }
 
-    fun onNodeTap() {
+    private fun onNodeTap() {
         viewModelScope.launch {
+            println("MODE: ${uiState.value.mode}")
         }
     }
 
-    fun navigateBack() {
+    private fun navigateBack() {
         viewModelScope.launch {
             navController.popBackStack()
             setEffect { Effect.NavigateBack }
         }
     }
 
-    fun onAddEdgeClick() {
+    private fun onAddEdgeClick() {
         viewModelScope.launch {
             setState { copy(name, id, graph, StateMode.ADDEDGE) }
+            println("MODE: ${uiState.value.mode}")
             setEffect { Effect.AddEdge }
         }
     }
 
-    fun onAddNodeClick() {
+    private fun onAddNodeClick() {
         viewModelScope.launch {
             setState { copy(name, id, graph, StateMode.ADDNODE) }
             setEffect { Effect.AddNode }
         }
     }
 
-    fun onDeleteEdgeClick() {
+    private fun onDeleteEdgeClick() {
         viewModelScope.launch {
             setState { copy(name, id, graph, StateMode.DELETEEDGE) }
+            println("MODE: ${uiState.value.mode}")
             setEffect { Effect.DeleteEdge }
         }
     }
 
-    fun onDeleteNodeClick() {
+    private fun onDeleteNodeClick() {
         viewModelScope.launch {
             setState { copy(name, id, graph, StateMode.DELETENODE) }
+            println("MODE: ${uiState.value.mode}")
             setEffect { Effect.DeleteNode }
         }
     }

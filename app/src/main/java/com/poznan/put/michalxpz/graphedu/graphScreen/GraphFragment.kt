@@ -7,6 +7,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
@@ -22,51 +23,11 @@ fun GraphFragment(
 ) {
     val graphJsonParser = GraphJsonParser()
     var graphJson = graphJsonParser.parseJsonStringToGraph(graph.graphJson)
-    var name = graph.name
-    var id = graph.id
-    val viewModel =  GraphFragmentViewModel(GraphsDatabase.getDataBase(LocalContext.current), graphJson, navController)
-    var mode = viewModel.uiState.value.mode
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val viewModel = GraphFragmentViewModel(GraphsDatabase.getDataBase(LocalContext.current),
+        graphJson,
+        navController)
+
     Scaffold() {
-        scope.launch {
-            viewModel.uiState.collect {
-                graphJson = viewModel.uiState.value.graph
-                id = viewModel.uiState.value.id
-                name = viewModel.uiState.value.name
-                mode = viewModel.uiState.value.mode
-            }
-
-            viewModel.effect.collect() {
-                when(it) {
-                    is GraphFragmentContract.Effect.CanvasClick -> {
-                        showToast("CANVAS CLICK", context)
-                    }
-                    is GraphFragmentContract.Effect.AddEdge -> {
-                        showToast("add edge", context)
-                    }
-                    is GraphFragmentContract.Effect.AddNode -> {
-                        showToast("add node", context)
-                    }
-                    is GraphFragmentContract.Effect.FetchingError -> {
-                        showToast("Error occurred", context)
-                    }
-                    is GraphFragmentContract.Effect.NavigateBack -> {
-
-                    }
-                    is GraphFragmentContract.Effect.NodeDrag -> {
-                        showToast("node drag", context)
-                    }
-                    is GraphFragmentContract.Effect.DeleteEdge -> {
-                        showToast("delete edfe", context)
-                    }
-                    is GraphFragmentContract.Effect.DeleteNode -> {
-                        showToast("delete node", context)
-                    }
-                }
-            }
-        }
-
         GraphScreen(
             state = viewModel.uiState.collectAsState().value,
             title = graph.name,
@@ -79,7 +40,6 @@ fun GraphFragment(
             viewModel = viewModel
         )
     }
-
 }
 
 

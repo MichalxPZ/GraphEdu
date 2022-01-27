@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
@@ -27,9 +28,12 @@ import com.poznan.put.michalxpz.graphedu.drawerMenu.DrawerMenu
 import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragment
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
+import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import com.poznan.put.michalxpz.graphedu.dialogs.AddGraphDialog
+import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragmentViewModel
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTheme
+import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
 import com.poznan.put.michalxpz.graphedu.utils.NullArgumentException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -193,3 +197,4 @@ fun GraphEduNavHost(
 
     }
 }
+

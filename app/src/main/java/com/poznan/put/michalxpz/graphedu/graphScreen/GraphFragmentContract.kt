@@ -40,10 +40,10 @@ interface GraphFragmentContract {
     }
 
     data class State(
-        val name: String,
-        val id: Int,
-        val graph: Graph,
-        val mode: StateMode
+        var name: String,
+        var id: Int,
+        var graph: Graph,
+        var mode: StateMode
 
     ) : UiState {
         companion object {
