@@ -1,9 +1,10 @@
 package com.poznan.put.michalxpz.graphedu.activity
 
+import android.util.Log
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
+import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract.*
 import com.poznan.put.michalxpz.graphedu.base.BaseViewModel
 import com.poznan.put.michalxpz.graphedu.data.Edge
@@ -16,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.abs
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(private val database: GraphsDatabase) : BaseViewModel<Event, State, Effect>() {
@@ -39,7 +41,7 @@ class MainActivityViewModel @Inject constructor(private val database: GraphsData
             is Event.OnCloseDialogClicked -> { closeDialog() }
             is Event.OnDialogTextEdit -> { editTextField() }
             is Event.OnOkDialogClicked -> { addGraph(uiState.value.editText) }
-            is Event.OnDeleteButtonClicked -> {  }
+            is Event.OnDeleteButtonClicked -> { deleteGraph( event.query) }
         }
     }
 
@@ -65,6 +67,8 @@ class MainActivityViewModel @Inject constructor(private val database: GraphsData
 
     private fun openOrCloseDrawer() {
         viewModelScope.launch {
+            setEffect { Effect.OpenDrawer }
+            delay(300)
             if (currentState.drawerState.isOpen) {
                 setState {
                     copy(isLoading,
@@ -84,7 +88,6 @@ class MainActivityViewModel @Inject constructor(private val database: GraphsData
                         DrawerState(DrawerValue.Open))
                 }
             }
-            setEffect { Effect.OpenDrawer }
         }
     }
 
@@ -112,7 +115,7 @@ class MainActivityViewModel @Inject constructor(private val database: GraphsData
         }
     }
 
-    fun deleteGraph(graphsItem: GraphsItem) {
+    private fun deleteGraph(graphsItem: GraphsItem) {
         viewModelScope.launch {
             val graphsItems = currentState.graphsItems
             graphsItems.remove(graphsItem)
@@ -120,6 +123,44 @@ class MainActivityViewModel @Inject constructor(private val database: GraphsData
             setState {
                 copy(isLoading, graphsItems, message, false, editText, drawerState)
             }
+        }
+    }
+
+    private fun onTapGesture(
+        it: Offset,
+        selectedVert: Int?,
+        mapOfVertices: MutableMap<Int, Pair<Int, Int>>,
+    ) {
+        var selectedVert1 = selectedVert
+        val x = it.x
+        val y = it.y
+        Log.i("SELECTED", "SELECTED: $x, $y")
+        if (selectedVert1 == null) {
+            mapOfVertices.forEach { (id, offset) ->
+                if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
+                    selectedVert1 = id
+                    Log.i("SELECTED", "SELECTED ID: $id")
+                }
+            }
+        } else {
+            Log.i("SELECTED", "SELECTED DRAG: $x, $y")
+            mapOfVertices.forEach { (id, offset) ->
+                if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
+                    selectedVert1 = id
+                    Log.i("SELECTED", "SELECTED ID: $id")
+                }
+            }
+            mapOfVertices.put(
+                selectedVert1!!,
+                Pair(x.toInt(), y.toInt())
+            )
+            Log.i(
+                "SELECTED",
+                "DRAG CHANGED TO: ${x + mapOfVertices.get(selectedVert1)!!.first}, ${
+                    y + mapOfVertices.get(selectedVert1)!!.second
+                }"
+            )
+            selectedVert1 = null
         }
     }
 

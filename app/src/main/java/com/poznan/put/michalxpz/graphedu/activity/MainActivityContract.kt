@@ -28,7 +28,9 @@ interface MainActivityContract {
         object OnOkDialogClicked: Event()
         object OnDialogTextEdit : Event()
         object OnCloseDialogClicked : Event()
-        object OnDeleteButtonClicked : Event()
+        class OnDeleteButtonClicked(
+            val query: GraphsItem
+        ) : Event()
     }
 
     data class State(

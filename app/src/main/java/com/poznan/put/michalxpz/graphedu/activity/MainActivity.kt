@@ -23,9 +23,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.poznan.put.michalxpz.graphedu.DrawerMenu.DrawerMenu
-import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragment
-import com.poznan.put.michalxpz.graphedu.GraphScreen.GraphFragmentViewModel
+import com.poznan.put.michalxpz.graphedu.drawerMenu.DrawerMenu
+import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragment
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.dialogs.AddGraphDialog

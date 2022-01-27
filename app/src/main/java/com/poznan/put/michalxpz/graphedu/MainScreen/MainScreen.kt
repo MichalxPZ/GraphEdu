@@ -5,7 +5,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.poznan.put.michalxpz.graphedu.DrawerMenu.TopBar
+import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
 
 @Composable
 fun MainScreen(

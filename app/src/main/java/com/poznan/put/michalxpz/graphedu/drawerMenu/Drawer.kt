@@ -1,4 +1,4 @@
-package com.poznan.put.michalxpz.graphedu.DrawerMenu
+package com.poznan.put.michalxpz.graphedu.drawerMenu
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -13,15 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.poznan.put.michalxpz.graphedu.R
+import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityViewModel
-import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTypography
-import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun DrawerMenu(
@@ -106,7 +104,7 @@ private fun GraphEntriesColumn(
                     removeGraph = {
                         graphList.remove(graph)
                         deleted = !deleted
-                        viewmodel.deleteGraph(graph)
+                        viewmodel.setEvent(MainActivityContract.Event.OnDeleteButtonClicked(graph))
                         deleted = !deleted
                     }
                 )

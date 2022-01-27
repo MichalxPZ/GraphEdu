@@ -1,0 +1,62 @@
+package com.poznan.put.michalxpz.graphedu.graphScreen
+
+import androidx.compose.ui.geometry.Offset
+import com.poznan.put.michalxpz.graphedu.base.UiEffect
+import com.poznan.put.michalxpz.graphedu.base.UiEvent
+import com.poznan.put.michalxpz.graphedu.base.UiState
+import com.poznan.put.michalxpz.graphedu.data.Graph
+
+interface GraphFragmentContract {
+    sealed class Effect: UiEffect {
+        object NavigateBack: Effect()
+        object CanvasClick : Effect()
+        object NodeDrag : Effect()
+        object AddEdge : Effect()
+        object DeleteEdge : Effect()
+        object AddNode : Effect()
+        object DeleteNode : Effect()
+
+        data class FetchingError(val error: Throwable) : Effect()
+    }
+
+    sealed class Event : UiEvent {
+        object OnReturnClick : Event()
+        class OnCanvasClick(
+            val offset: Offset,
+            val selectedVert: Int?
+        ) : Event()
+        class OnNodeDrag(
+            val offset: Offset,
+            val selectedVert: Int?
+        ) : Event()
+        class OnNodeTap(
+            val offset: Offset,
+            val selectedVert: Int?
+        ) : Event()
+        object OnAddEdgesClick : Event()
+        object OnAddNodeClick : Event()
+        object OnDeleteNodeClick : Event()
+        object OnDeleteEdgeClick : Event()
+    }
+
+    data class State(
+        val name: String,
+        val id: Int,
+        val graph: Graph,
+        val mode: StateMode
+
+    ) : UiState {
+        companion object {
+            val empty = State("", 0, Graph(0, 0, arrayListOf(), arrayListOf()), StateMode.DEFAULT)
+        }
+    }
+
+    enum class StateMode {
+        DEFAULT,
+        MOVENODE,
+        ADDEDGE,
+        ADDNODE,
+        DELETENODE,
+        DELETEEDGE
+    }
+}

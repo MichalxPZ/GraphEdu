@@ -1,9 +1,8 @@
-package com.poznan.put.michalxpz.graphedu.DrawerMenu
+package com.poznan.put.michalxpz.graphedu.drawerMenu
 
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.poznan.put.michalxpz.graphedu.ui.*
 
 @Composable
 fun TopBar(title: String = "", buttonIcon: ImageVector, onButtonClicked: () -> Unit) {
