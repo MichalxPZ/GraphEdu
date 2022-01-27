@@ -22,16 +22,13 @@ interface GraphFragmentContract {
     sealed class Event : UiEvent {
         object OnReturnClick : Event()
         class OnCanvasClick(
-            val offset: Offset,
-            val selectedVert: Int?
+            val offset: Offset
         ) : Event()
         class OnNodeDrag(
-            val offset: Offset,
-            val selectedVert: Int?
+            val offset: Offset
         ) : Event()
         class OnNodeTap(
-            val offset: Offset,
-            val selectedVert: Int?
+            val offset: Offset
         ) : Event()
         object OnAddEdgesClick : Event()
         object OnAddNodeClick : Event()
@@ -43,11 +40,12 @@ interface GraphFragmentContract {
         var name: String,
         var id: Int,
         var graph: Graph,
-        var mode: StateMode
+        var mode: StateMode,
+        var selectedVert: Int?
 
     ) : UiState {
         companion object {
-            val empty = State("", 0, Graph(0, 0, arrayListOf(), arrayListOf()), StateMode.DEFAULT)
+            val empty = State("", 0, Graph(0, 0, arrayListOf(), arrayListOf()), StateMode.DEFAULT, null)
         }
     }
 

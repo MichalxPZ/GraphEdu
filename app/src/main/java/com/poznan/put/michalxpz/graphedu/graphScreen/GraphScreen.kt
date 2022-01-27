@@ -2,7 +2,10 @@ package com.poznan.put.michalxpz.graphedu.graphScreen
 
 import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Scaffold
@@ -17,23 +20,16 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.poznan.put.michalxpz.graphedu.R
-import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
+import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
 import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFabItem
 import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFabState
 import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFloatingActionButton
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 @Composable
 fun GraphScreen(
@@ -45,58 +41,46 @@ fun GraphScreen(
     onVerticePositionChanged: () -> Unit,
     onDeleteVertice: () -> Unit,
     onDeleteEdge: () -> Unit,
-    viewModel: GraphFragmentViewModel,
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    viewModel: GraphFragmentViewModel
 ) {
     val scope = rememberCoroutineScope()
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                scope.launch {
-                    viewModel.uiState.collect {
-                        state.graph = viewModel.uiState.value.graph
-                        state.id = viewModel.uiState.value.id
-                        state.name = viewModel.uiState.value.name
-                        state.mode = viewModel.uiState.value.mode
-                    }
+    LaunchedEffect(state) {
+        viewModel.uiState.collect {
+            state.graph = viewModel.uiState.value.graph
+            state.id = viewModel.uiState.value.id
+            state.name = viewModel.uiState.value.name
+            state.mode = viewModel.uiState.value.mode
+        }
 
-                    viewModel.effect.collect {
-                        when (it) {
-                            is GraphFragmentContract.Effect.CanvasClick -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-                            }
-                            is GraphFragmentContract.Effect.AddEdge -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-                            }
-                            is GraphFragmentContract.Effect.AddNode -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-                            }
-                            is GraphFragmentContract.Effect.FetchingError -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-                            }
-                            is GraphFragmentContract.Effect.NavigateBack -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-
-                            }
-                            is GraphFragmentContract.Effect.NodeDrag -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-                            }
-                            is GraphFragmentContract.Effect.DeleteEdge -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
-                            }
-                            is GraphFragmentContract.Effect.DeleteNode -> {
-                                println("MODE: ${viewModel.uiState.value.mode}")
+        viewModel.effect.collect {
+            when (it) {
+                is GraphFragmentContract.Effect.CanvasClick -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.AddEdge -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.AddNode -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.FetchingError -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.NavigateBack -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.NodeDrag -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.DeleteEdge -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
+                }
+                is GraphFragmentContract.Effect.DeleteNode -> {
+                    println("MODE: ${viewModel.uiState.value.mode}")
                             }
                         }
                     }
                 }
-            }
-            }
-            lifecycleOwner.lifecycle.addObserver(observer)
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        }
 
     var scale by remember { mutableStateOf(1f) }
     var rotation by remember { mutableStateOf(0f) }
@@ -153,7 +137,7 @@ fun GraphScreen(
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onPress = {
-                                onTapGesture(it, selectedVert, mapOfVertices)
+                                viewModel.setEvent(GraphFragmentContract.Event.OnCanvasClick(it))
                             },
                         )
                         detectDragGestures { change, dragAmount ->
@@ -212,58 +196,19 @@ fun GraphScreen(
     }
 }
 
-private fun onTapGesture(
-    it: Offset,
-    selectedVert: Int?,
-    mapOfVertices: MutableMap<Int, Pair<Int, Int>>,
-) {
-    var selectedVert1 = selectedVert
-    val x = it.x
-    val y = it.y
-    Log.i("SELECTED", "SELECTED: $x, $y")
-    if (selectedVert1 == null) {
-        mapOfVertices.forEach { (id, offset) ->
-            if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
-                selectedVert1 = id
-                Log.i("SELECTED", "SELECTED ID: $id")
-            }
-        }
-    } else {
-        Log.i("SELECTED", "SELECTED DRAG: $x, $y")
-        mapOfVertices.forEach { (id, offset) ->
-            if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
-                selectedVert1 = id
-                Log.i("SELECTED", "SELECTED ID: $id")
-            }
-        }
-        mapOfVertices.put(
-            selectedVert1!!,
-            Pair(x.toInt(), y.toInt())
-        )
-        Log.i(
-            "SELECTED",
-            "DRAG CHANGED TO: ${x + mapOfVertices.get(selectedVert1)!!.first}, ${
-                y + mapOfVertices.get(selectedVert1)!!.second
-            }"
-        )
-        selectedVert1 = null
-    }
-}
-
-
 @Preview(name = "graphFragment")
 @Composable
 fun GraphFragmentPreview() {
     GraphScreen(
 //        state = GraphFragmentContract.State.empty,
+        state = GraphFragmentContract.State.empty,
         title = "Graph Fragment",
         onBackArrowClicked = { },
-        state = GraphFragmentContract.State.empty,
-        onAddEdgeClicked = {},
         onAddVerticeClicked = {},
-        onDeleteEdge = {},
-        onDeleteVertice = {},
+        onAddEdgeClicked = {},
         onVerticePositionChanged = {},
+        onDeleteVertice = {},
+        onDeleteEdge = {},
         viewModel = GraphFragmentViewModel(GraphsDatabase.getDataBase( LocalContext.current),GraphFragmentContract.State.empty.graph, NavController(
             LocalContext.current) )
     )

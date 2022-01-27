@@ -1,13 +1,10 @@
 package com.poznan.put.michalxpz.graphedu.graphScreen
 
-import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
@@ -23,9 +20,7 @@ fun GraphFragment(
 ) {
     val graphJsonParser = GraphJsonParser()
     var graphJson = graphJsonParser.parseJsonStringToGraph(graph.graphJson)
-    val viewModel = GraphFragmentViewModel(GraphsDatabase.getDataBase(LocalContext.current),
-        graphJson,
-        navController)
+    val viewModel = GraphFragmentViewModel(GraphsDatabase.getDataBase(LocalContext.current), graphJson, navController)
 
     Scaffold() {
         GraphScreen(
@@ -40,11 +35,6 @@ fun GraphFragment(
             viewModel = viewModel
         )
     }
-}
-
-
-private fun showToast(message: String, context: Context) {
-    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 private fun onTapGesture(

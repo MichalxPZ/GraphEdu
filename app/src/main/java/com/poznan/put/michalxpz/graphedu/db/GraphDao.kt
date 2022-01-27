@@ -19,15 +19,18 @@ interface GraphDao {
 
     @Transaction
     @Query("SELECT * FROM graphsitem WHERE name LIKE :name")
-    suspend fun findByName(name: String,): GraphsItem
+    suspend fun findByName(name: String): GraphsItem
 
     @Transaction
     @Query("SELECT * FROM graphsitem WHERE id LIKE :id")
-    suspend fun findGraphItemById(id: Int,): GraphsItem
+    suspend fun findGraphItemById(id: Int): GraphsItem
 
     @Transaction
     @Insert
     suspend fun insertAllGraphItems(vararg graph: GraphsItem)
+
+    @Query("UPDATE graphsitem SET graphJson=:graph WHERE id = :id")
+    suspend fun updateGraph(graph: String, id: Int)
 
     @Transaction
     @Delete
