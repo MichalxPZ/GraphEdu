@@ -4,7 +4,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
@@ -19,7 +18,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
@@ -31,9 +29,9 @@ import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.data.Vertice
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
-import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFabItem
-import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFabState
-import com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette.MultiFloatingActionButton
+import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFabItem
+import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFabState
+import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFloatingActionButton
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
 import kotlinx.coroutines.flow.collect
 import java.lang.Math.abs

@@ -6,6 +6,7 @@ object Colors {
     val Primary001 = Color(0xff7bb9fa)
     val Primary002 = Color(0xff499ff8)
     val Primary003 = Color(0xffd7eafd)
+    val Primary004 = Color(0x88D7EAFD)
 
     val Success001 = Color(0xff38db81)
     val Success002 = Color(0xff21b965)

@@ -1,10 +1,13 @@
 package com.poznan.put.michalxpz.graphedu.activity
 
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -49,6 +52,7 @@ class MainActivity : ComponentActivity() {
     private var drawerState = DrawerState(DrawerValue.Closed)
     private var openDialog = false
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -107,6 +111,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun GraphEduApp(
     state: MainActivityContract.State,
@@ -162,6 +167,7 @@ fun GraphEduApp(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.N)
 @Composable
 fun GraphEduNavHost(
     navController: NavHostController,
@@ -176,7 +182,17 @@ fun GraphEduNavHost(
         modifier = modifier
     ) {
         composable(GraphEduNavigation.MainScreen.name) {
-            MainScreen(navController = navController) { openDrawer() }
+            var grapnNum = 0
+            var verticesNum = 0
+            var edgesNum = 0
+            val graphJsonParser = GraphJsonParser()
+            viewModel.database.graphDao.getAllGraphItems().forEach {
+                grapnNum += 1
+                verticesNum += graphJsonParser.parseJsonStringToGraph(it.graphJson).num_of_vertices
+                edgesNum += graphJsonParser.parseJsonStringToGraph(it.graphJson).num_of_edges
+                Log.i("STATS", "G$grapnNum v$verticesNum  e$edgesNum")
+            }
+            MainScreen(navController = navController, graphNum = grapnNum, verticesNum = verticesNum, edgesNum = edgesNum) { openDrawer() }
         }
         composable(
             route = "${GraphEduNavigation.GraphScreen.name}/{graphId}",

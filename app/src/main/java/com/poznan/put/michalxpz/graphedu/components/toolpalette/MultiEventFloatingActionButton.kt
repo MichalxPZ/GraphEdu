@@ -1,4 +1,4 @@
-package com.poznan.put.michalxpz.graphedu.graphScreen.toolpalette
+package com.poznan.put.michalxpz.graphedu.components.toolpalette
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.Column
