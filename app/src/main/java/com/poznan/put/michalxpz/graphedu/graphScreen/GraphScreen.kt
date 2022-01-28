@@ -32,6 +32,7 @@ import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
 import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFabItem
 import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFabState
 import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFloatingActionButton
+import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
 import kotlinx.coroutines.flow.collect
 import java.lang.Math.abs
@@ -51,9 +52,14 @@ fun GraphScreen(
 ) {
 
     val state by remember { mutableStateOf(viewModel.uiState.value) }
-    val jsonString = viewModel.database.graphDao.getAllGraphItems().filter { it.id == graphItem.id }.get(0)
+    var jsonString = ""
     val graphJsonParser = GraphJsonParser()
-    val graph = graphJsonParser.parseJsonStringToGraph(jsonString.graphJson)
+    try {
+        jsonString = viewModel.database.graphDao.getAllGraphItems().filter { it.id == graphItem.id }.get(0).graphJson
+    } catch (e: IndexOutOfBoundsException) {
+        jsonString = graphJsonParser.parseGraphToJsonString(Graph(0, 0, arrayListOf(), arrayListOf()))
+    }
+    val graph = graphJsonParser.parseJsonStringToGraph(jsonString)
 
     LaunchedEffect(state) {
         viewModel.uiState.collect {

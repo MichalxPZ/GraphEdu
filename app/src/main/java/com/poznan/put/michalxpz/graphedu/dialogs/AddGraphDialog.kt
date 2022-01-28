@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityViewModel
+import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 
 
 @Composable
@@ -19,6 +20,7 @@ fun AddGraphDialog(
     message: MutableState<String>,
     editText: MutableState<String>,
     openDialog: Boolean,
+    graphs: ArrayList<GraphsItem>,
     viewModel: MainActivityViewModel
 ) {
 
@@ -65,6 +67,10 @@ fun AddGraphDialog(
                     viewModel.setEvent(MainActivityContract.Event.OnDialogTextEdit)
                     viewModel.setEvent(MainActivityContract.Event.OnOkDialogClicked)
                     viewModel.setEvent(MainActivityContract.Event.OnCloseDialogClicked)
+                    graphs.clear()
+                    viewModel.database.graphDao.getAllGraphItems().forEach {
+                        graphs.add(it)
+                    }
                 }
             ) {
                 Text("OK")
