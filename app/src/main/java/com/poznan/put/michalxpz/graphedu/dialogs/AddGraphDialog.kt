@@ -67,10 +67,8 @@ fun AddGraphDialog(
                     viewModel.setEvent(MainActivityContract.Event.OnDialogTextEdit)
                     viewModel.setEvent(MainActivityContract.Event.OnOkDialogClicked)
                     viewModel.setEvent(MainActivityContract.Event.OnCloseDialogClicked)
-                    graphs.clear()
-                    viewModel.database.graphDao.getAllGraphItems().forEach {
-                        graphs.add(it)
-                    }
+                    editText.value = ""
+                    viewModel.uiState.value.editText = ""
                 }
             ) {
                 Text("OK")

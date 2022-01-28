@@ -52,18 +52,16 @@ fun GraphScreen(
 ) {
 
     val state by remember { mutableStateOf(viewModel.uiState.value) }
-    var jsonString = ""
     val graphJsonParser = GraphJsonParser()
-    try {
-        jsonString = viewModel.database.graphDao.getAllGraphItems().filter { it.id == graphItem.id }.get(0).graphJson
-    } catch (e: IndexOutOfBoundsException) {
-        jsonString = graphJsonParser.parseGraphToJsonString(Graph(0, 0, arrayListOf(), arrayListOf()))
+    var graph = state.graph
+    Log.i("OPEN", graphJsonParser.parseGraphToJsonString(state.graph))
+    if (viewModel.uiState.value.graph.vertices.isEmpty()) {
+        graph.vertices.add(Vertice("RED", 1, -11500, -11500))
     }
-    val graph = graphJsonParser.parseJsonStringToGraph(jsonString)
 
     LaunchedEffect(state) {
         viewModel.uiState.collect {
-            state.graph = viewModel.uiState.value.graph
+            graph = viewModel.uiState.value.graph
             state.id = viewModel.uiState.value.id
             state.name = viewModel.uiState.value.name
             state.mode = viewModel.uiState.value.mode
@@ -290,18 +288,25 @@ fun GraphScreen(
 
                                 } else if (mode == GraphFragmentContract.StateMode.DELETENODE) {
                                     mode = GraphFragmentContract.StateMode.DEFAULT
+                                    var deleteVart: Vertice? = null
                                     mapOfVertices.forEach { (id, offset) ->
                                         if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
                                             mode = GraphFragmentContract.StateMode.DEFAULT
                                             selectedVert = id
                                             graph.vertices.forEach {
                                                 if (it.vertex_id == selectedVert) {
-                                                    graph.vertices.remove(it)
+                                                    deleteVart = it
                                                 }
                                             }
-                                            mapOfVertices.remove(selectedVert)
                                             Log.i("SELECTED", "SELECTED ID: $id")
                                         }
+                                    }
+                                    if (deleteVart != null) {
+                                        graph.vertices.remove(deleteVart)
+                                        graph.edges.removeIf {
+                                            it.end == selectedVert || it.start == selectedVert
+                                        }
+                                        mapOfVertices.remove(selectedVert)
                                     }
                                     viewModel.updateDatabase(graph)
 

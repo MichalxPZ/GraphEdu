@@ -126,42 +126,4 @@ class MainActivityViewModel @Inject constructor(val database: GraphsDatabase) : 
         }
     }
 
-    private fun onTapGesture(
-        it: Offset,
-        selectedVert: Int?,
-        mapOfVertices: MutableMap<Int, Pair<Int, Int>>,
-    ) {
-        var selectedVert1 = selectedVert
-        val x = it.x
-        val y = it.y
-        Log.i("SELECTED", "SELECTED: $x, $y")
-        if (selectedVert1 == null) {
-            mapOfVertices.forEach { (id, offset) ->
-                if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
-                    selectedVert1 = id
-                    Log.i("SELECTED", "SELECTED ID: $id")
-                }
-            }
-        } else {
-            Log.i("SELECTED", "SELECTED DRAG: $x, $y")
-            mapOfVertices.forEach { (id, offset) ->
-                if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
-                    selectedVert1 = id
-                    Log.i("SELECTED", "SELECTED ID: $id")
-                }
-            }
-            mapOfVertices.put(
-                selectedVert1!!,
-                Pair(x.toInt(), y.toInt())
-            )
-            Log.i(
-                "SELECTED",
-                "DRAG CHANGED TO: ${x + mapOfVertices.get(selectedVert1)!!.first}, ${
-                    y + mapOfVertices.get(selectedVert1)!!.second
-                }"
-            )
-            selectedVert1 = null
-        }
-    }
-
 }

@@ -193,7 +193,18 @@ fun GraphEduNavHost(
                 edgesNum += graphJsonParser.parseJsonStringToGraph(it.graphJson).num_of_edges
                 Log.i("STATS", "G$grapnNum v$verticesNum  e$edgesNum")
             }
-            MainScreen(navController = navController, graphNum = grapnNum, verticesNum = verticesNum, edgesNum = edgesNum) { openDrawer() }
+            MainScreen(
+                navController = navController,
+                graphNum = grapnNum,
+                verticesNum = verticesNum,
+                edgesNum = edgesNum)
+            {
+                openDrawer()
+                graphs.clear()
+                viewModel.database.graphDao.getAllGraphItems().forEach {
+                    graphs.add(it)
+                }
+            }
         }
         composable(
             route = "${GraphEduNavigation.GraphScreen.name}/{graphId}",
@@ -209,12 +220,13 @@ fun GraphEduNavHost(
             var graphInstance = Graph(0, 0, arrayListOf(), arrayListOf())
             val graph: GraphsItem = try {
                 viewModel.database.graphDao.getAllGraphItems()
-                    .filter { it.id == graphId?.toInt() }.get(0)
+                    .filter { it.id == graphId?.toInt() }[0]
             } catch (e: IndexOutOfBoundsException) {
                 graphInstance = Graph(0, 0, arrayListOf(), arrayListOf())
 
                 GraphsItem(name = "name", graphJsonParser.parseGraphToJsonString(graphInstance))
             }
+            Log.i("OPEN", graph.graphJson)
             graphId?.let { GraphFragment(graph, navController) } ?: throw NullArgumentException("graphId")
         }
 

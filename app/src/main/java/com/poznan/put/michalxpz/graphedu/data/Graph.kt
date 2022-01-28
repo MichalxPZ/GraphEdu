@@ -4,5 +4,5 @@ class Graph(
     var num_of_vertices: Int,
     var num_of_edges: Int,
     var vertices: ArrayList<Vertice>,
-    val edges: ArrayList<Edge>
+    var edges: ArrayList<Edge>
 )
