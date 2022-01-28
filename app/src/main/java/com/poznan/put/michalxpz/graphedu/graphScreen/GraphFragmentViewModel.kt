@@ -9,7 +9,6 @@ import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragmentContract.*
 import com.poznan.put.michalxpz.graphedu.base.BaseViewModel
 import com.poznan.put.michalxpz.graphedu.data.Edge
 import com.poznan.put.michalxpz.graphedu.data.Graph
-import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.data.Vertice
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
@@ -17,19 +16,20 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 
-class GraphFragmentViewModel (private val database: GraphsDatabase, private val graph: Graph, private val navController: NavController) : BaseViewModel<Event, State, Effect>() {
+class GraphFragmentViewModel (val database: GraphsDatabase, private val graph: Graph, private val navController: NavController, private val graphId: Int) : BaseViewModel<Event, State, Effect>() {
 
 
     init {
         viewModelScope.launch {
-            val graphAdd = graph
-            graphAdd.vertices.add(Vertice(vertex_id = 1, color = "RED", x_pos = 500, y_pos = 500))
-            graphAdd.vertices.add(Vertice(vertex_id = 2, color = "RED", x_pos = 700, y_pos = 300))
-            graphAdd.vertices.add(Vertice(vertex_id = 3, color = "RED", x_pos = 600, y_pos = 600))
-            graphAdd.edges.add(Edge(2, 1))
-            graphAdd.edges.add(Edge(3, 2))
-            graphAdd.edges.add(Edge(1, 3))
-            setState { copy(name, id, graphAdd) }
+            try {
+                val graphJsonParser = GraphJsonParser()
+                val jsonString =
+                    database.graphDao.getAllGraphItems().filter { it.id == graphId }.get(0)
+                val graphAdd = graphJsonParser.parseJsonStringToGraph(jsonString.graphJson)
+                setState { copy(name, id, graphAdd) }
+            } catch (e: IndexOutOfBoundsException) {
+                setState { copy(name, id, graph, mode, selectedVert) }
+            }
         }
     }
 
@@ -41,35 +41,37 @@ class GraphFragmentViewModel (private val database: GraphsDatabase, private val 
         when(event) {
             is Event.OnReturnClick -> { navigateBack() }
             is Event.OnCanvasClick -> {
-                onCanvasClick(offset = event.offset)
+                onCanvasClick(offset = event.offset, event.graph)
                 setState { copy(name, id, uiState.value.graph, mode, selectedVert) }
             }
             is Event.OnAddEdgesClick -> { onAddEdgeClick() }
             is Event.OnAddNodeClick -> { onAddNodeClick() }
-            is Event.OnNodeDrag -> { onNodeDrag() }
+            is Event.OnNodeDrag -> { onNodeDrag(event.vertice) }
             is Event.OnDeleteEdgeClick -> { onDeleteEdgeClick() }
             is Event.OnDeleteNodeClick -> { onDeleteNodeClick() }
-            is Event.OnNodeTap -> { onNodeTap() }
+            is Event.OnNodeTap -> { onNodeTap(event.vertice) }
         }
     }
 
-    private fun onCanvasClick(offset: Offset) {
+    private fun onCanvasClick(offset: Offset, graph: Graph) {
         viewModelScope.launch {
-            onTapGesture(offset, uiState.value.graph.vertices)
+            updateDatabase(graph)
             setEffect { Effect.CanvasClick }
             println("MODE: ${uiState.value.mode}")
         }
     }
 
-    private fun onNodeDrag() {
+    private fun onNodeDrag(vertice: Vertice) {
         viewModelScope.launch {
+            setState { copy(name, id, graph, StateMode.MOVENODE, vertice.vertex_id) }
             setEffect { Effect.NodeDrag }
             println("MODE: ${uiState.value.mode}")
         }
     }
 
-    private fun onNodeTap() {
+    private fun onNodeTap(vertice: Vertice) {
         viewModelScope.launch {
+            setState { copy(name, id, graph, StateMode.MOVENODE, vertice.vertex_id) }
             println("MODE: ${uiState.value.mode}")
         }
     }
@@ -83,7 +85,7 @@ class GraphFragmentViewModel (private val database: GraphsDatabase, private val 
 
     private fun onAddEdgeClick() {
         viewModelScope.launch {
-            setState { copy(name, id, graph, StateMode.ADDEDGE) }
+            setState { copy(name, id, graph, StateMode.ADDEDGE, selectedVert) }
             println("MODE: ${uiState.value.mode}")
             setEffect { Effect.AddEdge }
         }
@@ -91,14 +93,14 @@ class GraphFragmentViewModel (private val database: GraphsDatabase, private val 
 
     private fun onAddNodeClick() {
         viewModelScope.launch {
-            setState { copy(name, id, graph, StateMode.ADDNODE) }
+            setState { copy(name, id, graph, StateMode.ADDNODE, selectedVert) }
             setEffect { Effect.AddNode }
         }
     }
 
     private fun onDeleteEdgeClick() {
         viewModelScope.launch {
-            setState { copy(name, id, graph, StateMode.DELETEEDGE) }
+            setState { copy(name, id, graph, StateMode.DELETEEDGE, selectedVert) }
             println("MODE: ${uiState.value.mode}")
             setEffect { Effect.DeleteEdge }
         }
@@ -106,57 +108,122 @@ class GraphFragmentViewModel (private val database: GraphsDatabase, private val 
 
     private fun onDeleteNodeClick() {
         viewModelScope.launch {
-            setState { copy(name, id, graph, StateMode.DELETENODE) }
+            setState { copy(name, id, graph, StateMode.DELETENODE, selectedVert) }
             println("MODE: ${uiState.value.mode}")
             setEffect { Effect.DeleteNode }
         }
     }
 
-    private suspend fun onTapGesture(
+    private fun onTapGesture(
         it: Offset,
-        vertices: ArrayList<Vertice>,
+        graph: Graph,
     ) {
-        val x = it.x
-        val y = it.y
-        val mapOfVertices = hashMapOf<Int, Pair<Int, Int>>()
+        viewModelScope.launch {
+            val x = it.x
+            val y = it.y
+            val mapOfVertices = hashMapOf<Int, Pair<Int, Int>>()
+            val vertices = graph.vertices
+            vertices.forEach { vert ->
+                mapOfVertices.put(vert.vertex_id, Pair(vert.x_pos, vert.y_pos))
+            }
+            Log.i("SELECTED", "SELECTED: $x, $y")
+            when(uiState.value.mode) {
+
+                StateMode.DEFAULT -> {
+                    mapOfVertices.forEach { (id, offset) ->
+                        if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
+                            setState { copy(name, id, graph, StateMode.MOVENODE, id) }
+                            Log.i("SELECTED", "SELECTED ID: $id")
+                        }
+                    }
+                }
+
+                StateMode.MOVENODE -> {
+                    Log.i("SELECTED", "SELECTED DRAG: $x, $y")
+                    mapOfVertices.forEach { (id, offset) ->
+                        if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
+                            setState { copy(name, id, graph, mode, id) }
+                            Log.i("SELECTED", "SELECTED ID: $id")
+                        }
+                    }
+                    mapOfVertices.put(
+                        uiState.value.selectedVert!!,
+                        Pair(x.toInt(), y.toInt())
+                    )
+                    Log.i(
+                        "SELECTED",
+                        "DRAG CHANGED TO: ${x + mapOfVertices.get(uiState.value.selectedVert)!!.first}, ${
+                            y + mapOfVertices.get(uiState.value.selectedVert)!!.second
+                        }"
+                    )
+                    setState { copy(name, id, graph, StateMode.DEFAULT, null) }
+                    updateGraphState(vertices, graph.edges)
+                }
+
+                StateMode.ADDEDGE -> {
+                }
+
+                StateMode.ADDNODE -> {
+                    Log.i("SELECTED", "SELECTED DRAG: $x, $y")
+                    var maxId = 0
+                    vertices.forEach { if (it.vertex_id > maxId) maxId = it.vertex_id+1 }
+                    vertices.add(Vertice("RED", maxId, x.toInt(), y.toInt()))
+                    mapOfVertices.put(maxId, Pair(x.toInt(), y.toInt()))
+                    updateGraphState(vertices, graph.edges)
+                }
+
+                StateMode.DELETENODE -> {
+                    Log.i("SELECTED", "SELECTED DRAG: $x, $y")
+                    mapOfVertices.forEach { (id, offset) ->
+                        if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
+                            vertices.forEach {
+                                if (it.vertex_id == id) {
+                                    vertices.remove(it)
+                                    mapOfVertices.remove(id)
+                                }
+                            }
+                            updateGraphState(vertices, graph.edges)
+                            setState { copy(name, id, graph, StateMode.DEFAULT, id) }
+                            Log.i("SELECTED", "SELECTED ID: $id")
+                        }
+                    }
+                }
+
+                StateMode.DELETEEDGE -> {
+                }
+                }
+            updateGraphState(vertices, graph.edges)
+        }
+    }
+
+    fun updateDatabase(graph: Graph) {
+        viewModelScope.launch {
+            updateGraphState(
+                vertices = graph.vertices,
+                edges = graph.edges
+            )
+        }
+    }
+
+    private suspend fun updateGraphState(
+        vertices: ArrayList<Vertice>,
+        edges: ArrayList<Edge>
+    ) {
+        val mapOfVertices = HashMap<Int, Pair<Int, Int>>()
         vertices.forEach { vert ->
             mapOfVertices.put(vert.vertex_id, Pair(vert.x_pos, vert.y_pos))
         }
-        Log.i("SELECTED", "SELECTED: $x, $y")
-        if (uiState.value.selectedVert == null) {
-            mapOfVertices.forEach { (id, offset) ->
-                if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
-                    uiState.value.selectedVert = id
-                    Log.i("SELECTED", "SELECTED ID: $id")
-                }
-            }
-        } else {
-            Log.i("SELECTED", "SELECTED DRAG: $x, $y")
-            mapOfVertices.forEach { (id, offset) ->
-                if (abs(offset.first - x) < 30 && abs(offset.second - y) < 30) {
-                    uiState.value.selectedVert = id
-                    Log.i("SELECTED", "SELECTED ID: $id")
-                }
-            }
-            mapOfVertices.put(
-                uiState.value.selectedVert!!,
-                Pair(x.toInt(), y.toInt())
-            )
-            Log.i(
-                "SELECTED",
-                "DRAG CHANGED TO: ${x + mapOfVertices.get(uiState.value.selectedVert)!!.first}, ${
-                    y + mapOfVertices.get(uiState.value.selectedVert)!!.second
-                }"
-            )
-            uiState.value.selectedVert = null
-        }
-        vertices.forEach{ vertice ->
-            vertice.x_pos = mapOfVertices.get(vertice.vertex_id)!!.first
-            vertice.y_pos = mapOfVertices.get(vertice.vertex_id)!!.second
-        }
-        uiState.value.graph.vertices = vertices
+
+        val newGraph = Graph(vertices.size, edges.size, vertices, edges)
+
         val graphJsonParser = GraphJsonParser()
-        val jsonString = graphJsonParser.parseGraphToJsonString(uiState.value.graph)
-        database.graphDao.updateGraph(jsonString, uiState.value.id)
+
+        val jsonString = graphJsonParser.parseGraphToJsonString(newGraph)
+        Log.i("UPDATE DB", "updated ${graph.vertices}")
+        Log.i("UPDATE DB", "updated ${jsonString}")
+        Log.i("UPDATE DB", "updated ${graphId}")
+
+        database.graphDao.updateGraph(jsonString, graphId)
+        setState { copy(name, id, newGraph, mode, selectedVert) }
     }
 }

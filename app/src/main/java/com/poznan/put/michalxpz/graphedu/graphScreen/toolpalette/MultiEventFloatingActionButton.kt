@@ -12,10 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.poznan.put.michalxpz.graphedu.R
+import com.poznan.put.michalxpz.graphedu.Colors
+import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragmentContract
 
 @Composable
 fun MultiFloatingActionButton(
@@ -24,7 +24,8 @@ fun MultiFloatingActionButton(
     toState: MultiFabState,
     showLabels: Boolean = true,
     stateChanged: (fabstate: MultiFabState) -> Unit,
-    onFabItemClicked: (item: MultiFabItem) -> Unit
+    onFabItemClicked: (item: MultiFabItem) -> Unit,
+    mode: GraphFragmentContract.StateMode
 ) {
     val transition: Transition<MultiFabState> = updateTransition(targetState = toState, label = "transition")
     val scale: Float by transition.animateFloat(label = "scale") { state ->
@@ -49,7 +50,22 @@ fun MultiFloatingActionButton(
     }
     Column(horizontalAlignment = Alignment.End) {
         items.forEach { item ->
-            MiniFAB(item, alpha, shadow, scale, showLabels, onFabItemClicked)
+            var choosen = false
+            when(item.identifier) {
+                "add node" -> {
+                    choosen = mode == GraphFragmentContract.StateMode.ADDNODE
+                }
+                "add edge" -> {
+                    choosen = mode == GraphFragmentContract.StateMode.ADDEDGE
+                }
+                "delete node" -> {
+                    choosen = mode == GraphFragmentContract.StateMode.DELETENODE
+                }
+                "delete edge" -> {
+                    choosen = mode == GraphFragmentContract.StateMode.DELETEEDGE
+                }
+            }
+            MiniFAB(item, alpha, shadow, scale, showLabels, onFabItemClicked, choosen)
             Spacer(modifier = Modifier.height(20.dp))
         }
         FloatingActionButton(onClick = {
@@ -58,7 +74,9 @@ fun MultiFloatingActionButton(
                     MultiFabState.COLLAPSED
                 } else MultiFabState.EXPANDED
             )
-        }) {
+        },
+        backgroundColor = Colors.Primary001
+        ) {
             Icon(
                 bitmap = fabIcon,
                 contentDescription = "fab",

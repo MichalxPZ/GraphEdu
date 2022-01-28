@@ -5,6 +5,7 @@ import com.poznan.put.michalxpz.graphedu.base.UiEffect
 import com.poznan.put.michalxpz.graphedu.base.UiEvent
 import com.poznan.put.michalxpz.graphedu.base.UiState
 import com.poznan.put.michalxpz.graphedu.data.Graph
+import com.poznan.put.michalxpz.graphedu.data.Vertice
 
 interface GraphFragmentContract {
     sealed class Effect: UiEffect {
@@ -22,13 +23,14 @@ interface GraphFragmentContract {
     sealed class Event : UiEvent {
         object OnReturnClick : Event()
         class OnCanvasClick(
+            val graph: Graph,
             val offset: Offset
         ) : Event()
         class OnNodeDrag(
-            val offset: Offset
+            val vertice: Vertice
         ) : Event()
         class OnNodeTap(
-            val offset: Offset
+            val vertice: Vertice
         ) : Event()
         object OnAddEdgesClick : Event()
         object OnAddNodeClick : Event()

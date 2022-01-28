@@ -20,7 +20,7 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(private val database: GraphsDatabase) : BaseViewModel<Event, State, Effect>() {
+class MainActivityViewModel @Inject constructor(val database: GraphsDatabase) : BaseViewModel<Event, State, Effect>() {
 
     init {
         viewModelScope.launch {

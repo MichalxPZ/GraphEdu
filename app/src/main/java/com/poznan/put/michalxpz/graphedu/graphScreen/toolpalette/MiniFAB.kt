@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.poznan.put.michalxpz.graphedu.Colors
 
 @Composable
 fun MiniFAB(
@@ -33,8 +33,9 @@ fun MiniFAB(
     scale: Float,
     showLabel: Boolean,
     onFabItemClicked: (item: MultiFabItem) -> Unit,
+    choosen: Boolean,
 ) {
-    val fabColor = MaterialTheme.colors.secondary
+    val fabColor = Colors.Primary001
     val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -71,7 +72,11 @@ fun MiniFAB(
                 center = Offset(this.center.x + 2f, this.center.y + 7f),
                 radius = scale
             )
-            drawCircle(color = fabColor, scale)
+            var col = fabColor
+            if (choosen) {
+                col = Colors.Success002
+            }
+            drawCircle(color = col, scale)
             drawImage(
                 item.icon,
                 topLeft = Offset(

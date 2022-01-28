@@ -2,13 +2,12 @@ package com.poznan.put.michalxpz.graphedu.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.*
-import androidx.compose.material.MaterialTheme.colors
-import androidx.compose.material.MaterialTheme.shapes
-import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import com.poznan.put.michalxpz.graphedu.*
+import androidx.compose.ui.graphics.Color.Companion.White
+import com.poznan.put.michalxpz.graphedu.Colors.Black
+import com.poznan.put.michalxpz.graphedu.Colors.Danger002
+import com.poznan.put.michalxpz.graphedu.Colors.Primary001
+import com.poznan.put.michalxpz.graphedu.Colors.Primary002
 
 private val LightColors = lightColors(
     primary = Primary002,

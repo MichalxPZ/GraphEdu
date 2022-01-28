@@ -27,6 +27,7 @@ import androidx.navigation.navArgument
 import com.poznan.put.michalxpz.graphedu.drawerMenu.DrawerMenu
 import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragment
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
+import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
 import com.poznan.put.michalxpz.graphedu.dialogs.AddGraphDialog
@@ -136,7 +137,7 @@ fun GraphEduApp(
                 )
             }
         ) {
-            GraphEduNavHost(navController = navController, openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) }, graphs = state.graphsItems)
+            GraphEduNavHost(navController = navController, openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) }, graphs = state.graphsItems, viewModel = viewModel)
             if (state.openDialog) {
                 Box(
                     modifier = Modifier
@@ -166,8 +167,8 @@ fun GraphEduNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     openDrawer: () -> Unit,
-    graphs: List<GraphsItem>
-
+    graphs: List<GraphsItem>,
+    viewModel: MainActivityViewModel
 ) {
     NavHost(
         navController = navController,
@@ -187,10 +188,12 @@ fun GraphEduNavHost(
         ) { entry ->
 
             val graphId = entry.arguments?.getString("graphId")
-
-            val graph = graphs.filter {
-                it.id == graphId?.toInt()
-            }.get(0)
+            val graph: GraphsItem = try {
+                viewModel.database.graphDao.getAllGraphItems()
+                    .filter { it.id == graphId?.toInt() }.get(0)
+            } catch (e: IndexOutOfBoundsException) {
+                GraphsItem(name = "error", "")
+            }
 
             graphId?.let { GraphFragment(graph, navController) } ?: throw NullArgumentException("graphId")
         }

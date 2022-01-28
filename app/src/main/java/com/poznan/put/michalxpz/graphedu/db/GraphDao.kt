@@ -11,7 +11,7 @@ interface GraphDao {
 
     @Transaction
     @Query("SELECT * FROM graphsitem")
-    suspend fun getAllGraphItems(): List<GraphsItem>
+    fun getAllGraphItems(): List<GraphsItem>
 
     @Transaction
     @Query("SELECT * FROM graphsitem WHERE id IN (:graphIds)")
