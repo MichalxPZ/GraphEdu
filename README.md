@@ -37,16 +37,13 @@ Take a look at some of our features:
   <img src="art/Screenshot_20220129-005619_GraphEdu.jpg" width="300" />
 </p>
 
-![App Demo 1](art/ezgif-5-3c97550048.gif)
 ![App Demo 2](art/ezgif-5-040bb51d55.gif)
 ![App Demo 3](art/ezgif-5-260aa7c245.gif)
-
-
+![App Demo 1](art/ezgif-5-3c97550048.gif)
 
 
 ## How app would look like if I had unlimited time...
 <a name="plan"></a>
-Current app version presents kind of basic functionalities. In the future I'd like to develop it and make something bigger out of it. One of the first functionalities I'd like to have is a remote db that would store users. Integration of this app with some outside data source would not be that hard so it's the first main target to achieve.  
-Another nice to have feature is mobile and dev version. Since app is written in Kotlin it's not that hard to extract the business logic and implement it in some Native Android App. With other target platforms it's a hard one with my tech stack but we'll get there someday.  
-This app has got potential to manage all finances of users not only typing them down by hand and see results. One of a long distance goal is to develop payment system so users could use our app instead of their banks' apps.
-Application for sure could do with better UI, hope we'll get there too :)
+Current app version presents kind of basic functionalities. In the future I'd like to develop it and make something bigger out of it. One of the first functionalities I'd like to have is a remote db that would store users' data. Integration of this app with some outside data source would not be that hard so it's the first main target to achieve.  
+Another nice to have feature is a ios version. Since app is written in Kotlin it's not that hard to extract the business logic and implement it in Compose Multiplatform. I know Swift UI yet so that is another goal to learn that and migrate app to other platforms.  
+As App will be released on Google Play Store for sure I'm going to develop new functionalities according to suggestions from comments and also fix all bugs that will be pointed out in the future.
