@@ -23,6 +23,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.poznan.put.michalxpz.graphedu.R
 import com.poznan.put.michalxpz.graphedu.data.Edge
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
@@ -32,9 +35,8 @@ import com.poznan.put.michalxpz.graphedu.drawerMenu.TopBar
 import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFabItem
 import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFabState
 import com.poznan.put.michalxpz.graphedu.components.toolpalette.MultiFloatingActionButton
-import com.poznan.put.michalxpz.graphedu.data.Graph
+import com.poznan.put.michalxpz.graphedu.repository.GraphRepositoryImpl
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
-import kotlinx.coroutines.flow.collect
 import java.lang.Math.abs
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -392,6 +394,6 @@ fun GraphFragmentPreview() {
         onDeleteEdge = {},
         viewModel = GraphFragmentViewModel(GraphsDatabase.getDataBase( LocalContext.current),GraphFragmentContract.State.empty.graph, NavController(
             LocalContext.current), 1),
-        graphItem = GraphsItem("", "")
+        graphItem = GraphsItem(Firebase.auth.currentUser?.uid ?: "0", "", "")
     )
 }

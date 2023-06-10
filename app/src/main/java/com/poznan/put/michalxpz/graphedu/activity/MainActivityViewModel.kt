@@ -5,6 +5,8 @@ import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract.*
 import com.poznan.put.michalxpz.graphedu.base.BaseViewModel
 import com.poznan.put.michalxpz.graphedu.data.Edge
@@ -12,6 +14,7 @@ import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.data.Vertice
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
+import com.poznan.put.michalxpz.graphedu.repository.GraphRepository
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -20,11 +23,14 @@ import javax.inject.Inject
 import kotlin.math.abs
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(val database: GraphsDatabase) : BaseViewModel<Event, State, Effect>() {
+class MainActivityViewModel @Inject constructor(
+    val database: GraphsDatabase,
+    val repository: GraphRepository
+    ) : BaseViewModel<Event, State, Effect>() {
 
     init {
         viewModelScope.launch {
-            currentState.graphsItems = database.graphDao.getAllGraphItems() as ArrayList<GraphsItem>
+            currentState.graphsItems = database.graphDao.getAllGraphItems(Firebase.auth.currentUser?.uid ?: "0") as ArrayList<GraphsItem>
             delay(3000)
             currentState.isLoading = false
         }
@@ -104,7 +110,7 @@ class MainActivityViewModel @Inject constructor(val database: GraphsDatabase) : 
             val graph = Graph(0, 0, arrayListOf<Vertice>(), arrayListOf<Edge>())
             val graphJsonParser = GraphJsonParser()
             val jsonString = graphJsonParser.parseGraphToJsonString(graph)
-            val graphsItem = GraphsItem(name, jsonString)
+            val graphsItem = GraphsItem(Firebase.auth.currentUser?.uid ?: "0", name, jsonString)
             database.graphDao.insertAllGraphItems(graphsItem)
             val graphsItems = currentState.graphsItems
             graphsItems.add(graphsItem)

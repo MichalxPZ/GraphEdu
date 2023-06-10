@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -29,22 +30,32 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.poznan.put.michalxpz.graphedu.MainScreen.MainScreen
 import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.dialogs.AddGraphDialog
 import com.poznan.put.michalxpz.graphedu.drawerMenu.DrawerMenu
 import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragment
+import com.poznan.put.michalxpz.graphedu.loginScreen.LoginScreen
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTheme
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
 import com.poznan.put.michalxpz.graphedu.utils.NullArgumentException
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    val db = Firebase.firestore
+    private lateinit var auth: FirebaseAuth
+    private var currentUser: FirebaseUser? = null
     private val viewModel: MainActivityViewModel by viewModels()
     private var message: String = ""
     private var graphs = ArrayList<GraphsItem>()
@@ -52,8 +63,15 @@ class MainActivity : ComponentActivity() {
     private var drawerState = DrawerState(DrawerValue.Closed)
     private var openDialog = false
 
+
+    override fun onStart() {
+        super.onStart()
+        auth = Firebase.auth
+        currentUser = auth.currentUser
+    }
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         setContent {
@@ -66,7 +84,7 @@ class MainActivity : ComponentActivity() {
 
             GraphEduTheme {
                 Surface() {
-                    GraphEduApp(viewModel.uiState.collectAsState().value, viewModel, graphs)
+                    GraphEduApp(viewModel.uiState.collectAsState().value, viewModel, graphs, currentUser, db)
                 }
             }
         }
@@ -116,10 +134,13 @@ class MainActivity : ComponentActivity() {
 fun GraphEduApp(
     state: MainActivityContract.State,
     viewModel: MainActivityViewModel,
-    graphs: ArrayList<GraphsItem>
+    graphs: ArrayList<GraphsItem>,
+    currentUser: FirebaseUser?,
+    externalFirebaseDb: FirebaseFirestore
 ) {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     Surface() {
 
@@ -139,11 +160,33 @@ fun GraphEduApp(
                     onButtonClick = {
                         viewModel.setEvent(MainActivityContract.Event.OnCreateButtonClicked)
                     },
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    navigateLogout = {
+                        navController.navigate(GraphEduNavigation.LoginScreen.name)
+                        coroutineScope.launch {
+                            state.drawerState.close()
+                        }
+                    }
                 )
             }
         ) {
-            GraphEduNavHost(navController = navController, openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) }, graphs = state.graphsItems, viewModel = viewModel)
+            if (currentUser != null) {
+                GraphEduNavHost(
+                    navController = navController,
+                    openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) },
+                    graphs = state.graphsItems,
+                    viewModel = viewModel,
+                    startDestination = GraphEduNavigation.GraphScreen.name
+                )
+            } else {
+                GraphEduNavHost(
+                    navController = navController,
+                    openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) },
+                    graphs = state.graphsItems,
+                    viewModel = viewModel,
+                    startDestination = GraphEduNavigation.LoginScreen.name
+                )
+            }
             if (state.openDialog) {
                 Box(
                     modifier = Modifier
@@ -161,7 +204,9 @@ fun GraphEduApp(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    AddGraphDialog(mutableStateOf(state.message), mutableStateOf(state.editText), state.openDialog, graphs, viewModel)
+                    AddGraphDialog(remember {
+
+                    mutableStateOf(state.message) }, remember { mutableStateOf(state.editText) }, state.openDialog, graphs, viewModel)
                 }
             }
         }
@@ -175,19 +220,24 @@ fun GraphEduNavHost(
     modifier: Modifier = Modifier,
     openDrawer: () -> Unit,
     graphs: ArrayList<GraphsItem>,
-    viewModel: MainActivityViewModel
+    viewModel: MainActivityViewModel,
+    startDestination: String
 ) {
     NavHost(
         navController = navController,
-        startDestination = GraphEduNavigation.MainScreen.name,
+        startDestination = startDestination,
         modifier = modifier
     ) {
+        composable(GraphEduNavigation.LoginScreen.name) {
+            LoginScreen(navController)
+        }
+
         composable(GraphEduNavigation.MainScreen.name) {
             var grapnNum = 0
             var verticesNum = 0
             var edgesNum = 0
             val graphJsonParser = GraphJsonParser()
-            viewModel.database.graphDao.getAllGraphItems().forEach {
+            viewModel.database.graphDao.getAllGraphItems(Firebase.auth.currentUser?.uid ?: "0").forEach {
                 grapnNum += 1
                 verticesNum += graphJsonParser.parseJsonStringToGraph(it.graphJson).num_of_vertices
                 edgesNum += graphJsonParser.parseJsonStringToGraph(it.graphJson).num_of_edges
@@ -201,7 +251,7 @@ fun GraphEduNavHost(
             {
                 openDrawer()
                 graphs.clear()
-                viewModel.database.graphDao.getAllGraphItems().forEach {
+                viewModel.database.graphDao.getAllGraphItems(Firebase.auth.currentUser?.uid ?: "0").forEach {
                     graphs.add(it)
                 }
             }
@@ -219,12 +269,12 @@ fun GraphEduNavHost(
             val graphJsonParser = GraphJsonParser()
             var graphInstance = Graph(0, 0, arrayListOf(), arrayListOf())
             val graph: GraphsItem = try {
-                viewModel.database.graphDao.getAllGraphItems()
+                viewModel.database.graphDao.getAllGraphItems(Firebase.auth.currentUser?.uid ?: "0")
                     .filter { it.id == graphId?.toInt() }[0]
             } catch (e: IndexOutOfBoundsException) {
                 graphInstance = Graph(0, 0, arrayListOf(), arrayListOf())
 
-                GraphsItem(name = "name", graphJsonParser.parseGraphToJsonString(graphInstance))
+                GraphsItem(uid = Firebase.auth.currentUser?.uid ?: "0",name = "name", graphJson = graphJsonParser.parseGraphToJsonString(graphInstance))
             }
             Log.i("OPEN", graph.graphJson)
             graphId?.let { GraphFragment(graph, navController) } ?: throw NullArgumentException("graphId")

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "324634925560",
+    "project_id": "graphedu-3fbb8",
+    "storage_bucket": "graphedu-3fbb8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324634925560:android:79533129ceb92bc7b01e0d",
+        "android_client_info": {
+          "package_name": "com.poznan.put.michalxpz.graphedu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324634925560-6opdn0ade8kc2r8628heh3r3qg1c6pk7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.poznan.put.michalxpz.graphedu",
+            "certificate_hash": "8d6894e2d818a22769ab60a2c58c57fc178c71cb"
+          }
+        },
+        {
+          "client_id": "324634925560-q2d40h3agiojikcjnd9u2fe0qsfeeati.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCucBe5DD5VENCRDVGOCEpH6ljh8IX26ls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324634925560-cjh7tjgnscbaed1n50og4r958l1m021h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

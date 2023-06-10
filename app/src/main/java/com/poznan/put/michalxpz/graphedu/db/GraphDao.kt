@@ -10,12 +10,12 @@ import com.poznan.put.michalxpz.graphedu.data.Vertice
 interface GraphDao {
 
     @Transaction
-    @Query("SELECT * FROM graphsitem")
-    fun getAllGraphItems(): List<GraphsItem>
+    @Query("SELECT * FROM graphsitem where uid == :uid")
+    fun getAllGraphItems(uid: String): List<GraphsItem>
 
     @Transaction
-    @Query("SELECT * FROM graphsitem WHERE id IN (:graphIds)")
-    suspend fun loadAllGraphItemsByIds(graphIds: IntArray): List<GraphsItem>
+    @Query("SELECT * FROM graphsitem")
+    fun getAllGraphItemsWithoutAuth(): List<GraphsItem>
 
     @Transaction
     @Query("SELECT * FROM graphsitem WHERE name LIKE :name")

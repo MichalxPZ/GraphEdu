@@ -5,12 +5,15 @@ import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.poznan.put.michalxpz.graphedu.graphScreen.GraphFragmentContract.*
 import com.poznan.put.michalxpz.graphedu.base.BaseViewModel
 import com.poznan.put.michalxpz.graphedu.data.Edge
 import com.poznan.put.michalxpz.graphedu.data.Graph
 import com.poznan.put.michalxpz.graphedu.data.Vertice
 import com.poznan.put.michalxpz.graphedu.db.GraphsDatabase
+import com.poznan.put.michalxpz.graphedu.repository.GraphRepository
 import com.poznan.put.michalxpz.graphedu.utils.GraphJsonParser
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -24,7 +27,7 @@ class GraphFragmentViewModel (val database: GraphsDatabase, private val graph: G
             try {
                 val graphJsonParser = GraphJsonParser()
                 val jsonString =
-                    database.graphDao.getAllGraphItems().filter { it.id == graphId }.get(0)
+                    database.graphDao.getAllGraphItems(Firebase.auth.currentUser?.uid ?: "0").filter { it.id == graphId }.get(0)
                 val graphAdd = graphJsonParser.parseJsonStringToGraph(jsonString.graphJson)
                 setState { copy(name, id, graphAdd) }
             } catch (e: IndexOutOfBoundsException) {

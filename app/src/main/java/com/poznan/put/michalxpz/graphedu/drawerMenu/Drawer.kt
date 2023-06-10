@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.poznan.put.michalxpz.graphedu.R
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityViewModel
+import com.poznan.put.michalxpz.graphedu.components.LogoutButton
 import com.poznan.put.michalxpz.graphedu.data.GraphsItem
 import com.poznan.put.michalxpz.graphedu.navigation.GraphEduNavigation
 import com.poznan.put.michalxpz.graphedu.ui.GraphEduTypography
@@ -27,12 +28,16 @@ fun DrawerMenu(
     onDestinationClicked: (route: String) -> Unit,
     graphs: MutableList<GraphsItem>,
     onButtonClick: () -> Unit,
-    viewModel: MainActivityViewModel
+    viewModel: MainActivityViewModel,
+    navigateLogout: () -> Unit
 ) {
-    Column() {
+    Column {
         Entries(onDestinationClicked, graphs, viewModel)
         Spacer(modifier = Modifier.height(24.dp))
         AddGraph(onClick = { onButtonClick() })
+        LogoutButton(navigation = {
+            navigateLogout()
+        })
     }
 }
 
@@ -161,7 +166,7 @@ private fun GraphEntry(
         text = graph.name,
         style = GraphEduTypography.h4,
         modifier = Modifier.clickable {
-            onDestinationClicked("${GraphEduNavigation.values().get(1).name}/${graph.id}")
+            onDestinationClicked("${GraphEduNavigation.values().get(2).name}/${graph.id}")
         }
     )
     Image(
