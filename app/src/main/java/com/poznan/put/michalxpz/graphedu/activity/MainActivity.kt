@@ -62,12 +62,14 @@ class MainActivity : ComponentActivity() {
     private var editMessage: String = ""
     private var drawerState = DrawerState(DrawerValue.Closed)
     private var openDialog = false
-
+    private var quote = ""
 
     override fun onStart() {
         super.onStart()
         auth = Firebase.auth
         currentUser = auth.currentUser
+        viewModel.setEvent(MainActivityContract.Event.OnChangeQuote)
+        viewModel.getQuote()
     }
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,12 +94,14 @@ class MainActivity : ComponentActivity() {
 
     private fun initObservers() {
         lifecycleScope.launchWhenStarted {
+            viewModel.setEvent(MainActivityContract.Event.OnChangeQuote)
             viewModel.uiState.collect {
                 message = viewModel.uiState.value.message
                 graphs = viewModel.uiState.value.graphsItems
                 openDialog = viewModel.uiState.value.openDialog
                 editMessage = viewModel.uiState.value.editText
                 drawerState = viewModel.uiState.value.drawerState
+                quote = viewModel.uiState.value.quote
             }
         }
 
@@ -119,6 +123,10 @@ class MainActivity : ComponentActivity() {
                     }
                     is MainActivityContract.Effect.OpenDrawer -> {
                     }
+
+                    is MainActivityContract.Effect.ChangeQuote -> {
+                        quote = viewModel.uiState.value.quote
+                    }
                 }
             }
         }
@@ -136,7 +144,7 @@ fun GraphEduApp(
     viewModel: MainActivityViewModel,
     graphs: ArrayList<GraphsItem>,
     currentUser: FirebaseUser?,
-    externalFirebaseDb: FirebaseFirestore
+    externalFirebaseDb: FirebaseFirestore,
 ) {
     val navController = rememberNavController()
     val backstackEntry = navController.currentBackStackEntryAsState()
@@ -176,7 +184,7 @@ fun GraphEduApp(
                     openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) },
                     graphs = state.graphsItems,
                     viewModel = viewModel,
-                    startDestination = GraphEduNavigation.GraphScreen.name
+                    startDestination = GraphEduNavigation.MainScreen.name,
                 )
             } else {
                 GraphEduNavHost(
@@ -184,7 +192,7 @@ fun GraphEduApp(
                     openDrawer = { viewModel.setEvent(MainActivityContract.Event.OnOpenDrawerButtonClicked) },
                     graphs = state.graphsItems,
                     viewModel = viewModel,
-                    startDestination = GraphEduNavigation.LoginScreen.name
+                    startDestination = GraphEduNavigation.LoginScreen.name,
                 )
             }
             if (state.openDialog) {
@@ -221,8 +229,10 @@ fun GraphEduNavHost(
     openDrawer: () -> Unit,
     graphs: ArrayList<GraphsItem>,
     viewModel: MainActivityViewModel,
-    startDestination: String
+    startDestination: String,
 ) {
+    val state = viewModel.uiState.collectAsState()
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -247,7 +257,9 @@ fun GraphEduNavHost(
                 navController = navController,
                 graphNum = grapnNum,
                 verticesNum = verticesNum,
-                edgesNum = edgesNum)
+                edgesNum = edgesNum,
+                quote = state.value.quote
+            )
             {
                 openDrawer()
                 graphs.clear()

@@ -1,13 +1,13 @@
 package com.poznan.put.michalxpz.graphedu.activity
 
-import android.util.Log
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.poznan.put.michalxpz.graphedu.activity.MainActivityContract.*
+import com.poznan.put.michalxpz.graphedu.api.QuotesApi
 import com.poznan.put.michalxpz.graphedu.base.BaseViewModel
 import com.poznan.put.michalxpz.graphedu.data.Edge
 import com.poznan.put.michalxpz.graphedu.data.Graph
@@ -20,19 +20,31 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.abs
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     val database: GraphsDatabase,
-    val repository: GraphRepository
+    val repository: GraphRepository,
+    val quotesApi: QuotesApi
     ) : BaseViewModel<Event, State, Effect>() {
 
+    private val quoteMutableState = mutableStateOf("")
     init {
         viewModelScope.launch {
+            currentState.quote = quotesApi.getQuotes().first().quote
+            quoteMutableState.value = currentState.quote
             currentState.graphsItems = database.graphDao.getAllGraphItems(Firebase.auth.currentUser?.uid ?: "0") as ArrayList<GraphsItem>
             delay(3000)
             currentState.isLoading = false
+        }
+    }
+
+    fun getQuote() {
+        viewModelScope.launch {
+            val q = quotesApi.getQuotes().first().quote
+            setState {
+                copy(quote = q)
+            }
         }
     }
 
@@ -48,6 +60,15 @@ class MainActivityViewModel @Inject constructor(
             is Event.OnDialogTextEdit -> { editTextField() }
             is Event.OnOkDialogClicked -> { addGraph(uiState.value.editText) }
             is Event.OnDeleteButtonClicked -> { deleteGraph( event.query) }
+            is Event.OnChangeQuote -> { changeQuote() }
+        }
+    }
+
+    private fun changeQuote() {
+        viewModelScope.launch {
+            setState {
+                copy(quote = quoteMutableState.value)
+            }
         }
     }
 

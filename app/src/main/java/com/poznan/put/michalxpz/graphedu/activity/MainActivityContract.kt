@@ -18,6 +18,7 @@ interface MainActivityContract {
         object OpenDrawer: Effect()
         object CloseDialog : Effect()
         object EditText : Effect()
+        object ChangeQuote : Effect()
 
         data class FetchingError(val error: Throwable) : Effect()
     }
@@ -25,6 +26,7 @@ interface MainActivityContract {
     sealed class Event : UiEvent {
         object OnOpenDrawerButtonClicked : Event()
         object OnCreateButtonClicked : Event()
+        object OnChangeQuote : Event()
         object OnOkDialogClicked: Event()
         object OnDialogTextEdit : Event()
         object OnCloseDialogClicked : Event()
@@ -39,7 +41,8 @@ interface MainActivityContract {
         var message: String,
         var openDialog: Boolean,
         var editText: String,
-        var drawerState: DrawerState
+        var drawerState: DrawerState,
+        var quote: String
 
     ) : UiState {
         companion object {
@@ -49,7 +52,8 @@ interface MainActivityContract {
                 message = "Name of your graph",
                 openDialog = false,
                 editText = "",
-                drawerState = DrawerState(DrawerValue.Closed)
+                drawerState = DrawerState(DrawerValue.Closed),
+                quote = ""
             )
         }
     }
